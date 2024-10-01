@@ -7,9 +7,10 @@ For example, my file path to my work is PS C:\Users\Summer\Desktop\RateYourCity\
 
 To locally open this webpage just open your file explorer and click on the html file and it will automatically open on your browser to see the current webpage! :)
 
-Use this command to clone repository -> 
-->first just do to the path to add it so your users/desktop/rateyourcity folder open that in VS. open a new terminal then do this command:
-cd path/to/desired/directory
+Use this command to clone repository 
+
+-> first just do to the path to add it so your users/desktop/rateyourcity folder open that in VS. open a new terminal then do this command:
+cd path/to/rateyourcity/directory
 
 ok now enter this command to get the inital code:
 git clone https://github.com/summerolmstead/city-slickers.git
