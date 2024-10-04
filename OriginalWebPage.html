@@ -1,35 +1,30 @@
-<!-- Starter Code for SE RateYourCity. Beginning HTML Code. Created by Summer & Prisha-->
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8"> <!-- this is merely added for iphone display purposes basically defining webpage size on diff devices-->
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-      <!-- link to Google Fonts for Lexend Giga and Shippori Mincho B1 used for p and title - open to change-->
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Giga&family=Shippori+Mincho+B1:wght@400&display=swap" rel="stylesheet"> 
-
-    <title> Rate Your City </title> <!-- our app title! -->
+    <title>Rate Your City</title>
     <style>
-        /* CSS for design purposes inside of our webpage*/
         body {
-            background-image: url('chattpic4.jpg'); /* path must be saved to show correctly on local computer where this is saved*/
-            background-size: cover; /* covering the entire viewport (webpage) */
-            background-position: center; /* center the image of chattanooga */
-            color: rgb(255, 255, 255); /* text color for better visibility */
-            margin: 0; /* remove default margin*/
-            height: 100vh; 
-            display: flex; 
+            background-image: url('chattpic4.jpg');
+            background-size: cover;
+            background-position: center;
+            color: rgb(255, 255, 255);
+            margin: 0;
+            height: 100vh;
+            display: flex;
             flex-direction: column;
-            align-items: center; /* Center horizontally */
-            justify-content: flex-start; /* Align items to the start */
-            padding-top: 50px; /* Space from the top */
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 50px;
         }
         center {
-            text-align: center; /* center align content for design purposes! :) */
-            padding: 20px; /* add padding for spacing */
+            text-align: center;
+            padding: 20px;
         }
         h1  {
-                font-family: 'Lexend Giga', sans-serif; /* apply Lexend Giga font */
+                font-family: 'Lexend Giga', sans-serif; /* Apply Lexend Giga font */
                 margin-top: -5px; /* adjust this value to move the heading higher to fit bg pic better */
                 font-size: 42px; /* the title needs to be bigger to draw attention*/
             }
@@ -43,13 +38,13 @@
         form {
             display: flex;
             flex-direction: column;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 20px;
             border-radius: 10px;
-            width: 300px; /* Width of the form */
+            width: 300px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-top: 20px; /* space above the form from paragraph above*/
-            margin-left: 337px; /* Move form to the right because it was too left and have to center it */
+            margin-left: 180px; /* Move form to the right because it was too left and have to center it */
         }
         input {
             margin: 10px 0;
@@ -59,14 +54,45 @@
         }
         button {
             padding: 10px;
-            background-color: #1006c0; /* blue button to pop with bg */
-            color: white; 
+            background-color: #1006c0;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #06015d; /* darker blue on hover color for dimension */
+            background-color: #06015d;
+        }
+
+        /* Styling for the search box */
+        .search-container {
+            position: absolute; /* Position of the search box */
+            top: 20px; /* How high the box is on the page*/
+            right: 20px; /* How far right the box is on the page*/
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container input, .search-container button {
+            padding: 10px;  /* space between input and button*/
+            border: none;
+            border-radius: 5px;
+        }
+
+        .search-container input {
+            width: 200px;
+        }
+
+        .search-container button {
+            background-color: #1006c0; /* color mocs blue*/
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-right:+4px; /* spacing between the search button and search text field/drop down box*/
+        }
+
+        .search-container button:hover {
+            background-color: #06015d;
         }
         /* Meet the creators tab! styling */
         .creator-button {
@@ -88,40 +114,55 @@
     </style>
 </head>
 <body>
+    <!-- Search Box combined with text input and drop down menu -->
+    <div class="search-container">
+        <button onclick="searchCity()">Search</button>
+        <input list="cities" id="cityInput" placeholder="Select or seach for a city...">
+        <datalist id="cities">
+            <option value="Chattanooga">
+        </datalist>
+    </div>
+
     <center>
         <h1>Rate Your City</h1>
-        <p>Welcome to Rate Your City!</p>
-        <p>This is the app that allows you to see the ranking of popular restaurants, grocery stores, events, and entertainment spots here in Chattanooga.</p>
-        <p>This is currently the demo version. We are only offering Chattanooga, TN at the moment, we hope to implement other nearby cities in the future.</p>
+        <p>Welcome to Rate Your City! This is the app that allows you to see the ranking of each city available. </p>
+        <p>This is currently the demo version. We are only offering Chattanooga, TN at the moment.</p>
 
-        <!-- user login form by Summer & Prisha! -->
+        <!-- User login form -->
         <form id="loginForm">
             <input type="text" id="username" placeholder="Username or Email" required>
             <input type="password" id="password" placeholder="Password" required>
             <button type="submit">Log In</button>
         </form>
-
-        <script>
-        // simple javascript to handle form submission need higher language for logic and backend eventually
-            document.getElementById('loginForm').addEventListener('submit', function(event) 
-            {
-                event.preventDefault(); // error handling kinda to prevent form from automatically submitting
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                // add in logic when we found out what database to use for security measures
-                if (username === 'user' && password === 'pass') 
-                {
-                    alert('Login successful!');
-                    //potentially redirect to personalized user page with stored data on customer in a cust table
-                    //put in logic for this later
-                } 
-                else //failed login :( 
-                 {
-                 alert('Invalid username or password.');
-                 }
-            });
-        </script>
     </center>
+
+    <script>
+        // Search function to view chattanooga and other cities
+        function searchCity() {
+            var cityInput = document.getElementById('cityInput').value;
+
+            if (cityInput.toLowerCase() === 'chattanooga') {
+                window.location.href = 'Chattanooga.html';
+            } else {
+                alert('Choose or type a city.');
+            }
+        }
+
+        // Simple login form handling
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'user' && password === 'pass') {
+                alert('Login successful!');
+            } else {
+                alert('Invalid username or password.');
+            }
+        });
+    </script>
 </body>
 </html>
+
+
+
