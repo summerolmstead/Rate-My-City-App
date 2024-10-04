@@ -17,12 +17,12 @@
             background-position: center; /* center the image of chattanooga */
             color: rgb(255, 255, 255); /* text color for better visibility */
             margin: 0; /* remove default margin*/
-            height: 100vh; 
+            height: 150vh; 
             display: flex; 
             flex-direction: column;
-            align-items: center; /* Center horizontally */
-            justify-content: flex-start; /* Align items to the start */
-            padding-top: 50px; /* Space from the top */
+            align-items: center; /* center horizontally */
+            justify-content: flex-start; /* align items to the start */
+            padding-top: 50px; /* space from the top */
         }
         center {
             text-align: center; /* center align content for design purposes! :) */
@@ -68,9 +68,27 @@
         button:hover {
             background-color: #06015d; /* darker blue on hover color for dimension */
         }
+        /* Meet the creators tab! styling */
+        .creator-button {
+            position: absolute; /* Position it at the top left */
+            top: 20px; /* Distance from the top */
+            left: 20px; /* Distance from the left */
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            color: white; 
+            padding: 10px 15px; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Lexend Giga', sans-serif; 
+            font-size: 16px; 
+        }
+        .creator-button:hover {
+            background-color: #06015d; /* Darker on hover */
+        }
     </style>
 </head>
 <body>
+    <button class="creator-button" onclick="location.href='MeetTheCreators.html'">Meet the Creators</button> <!-- New button -->
     <center>
         <h1>Rate Your City</h1>
         <p>Welcome to Rate Your City! This is the app that allows you to see the ranking of each city available. </p>
