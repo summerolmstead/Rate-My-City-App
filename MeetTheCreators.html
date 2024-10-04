@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* CSS for design purposes for our page! */
+        body {
+            margin: 0; /* remove default margin */
+            background-image: url('utcpic7.jpg'); /*pic of chamberlain field */
+            background-size: cover; /* cover the entire viewport to fix webpage */
+            background-position: center; /* centering the image so isnt some weird side corner of image lol*/
+            height: 100vh; 
+            display: flex; /* using flexbox for centering also again*/
+            align-items: center; /* center vertically, to make sure its all correcltly in middle */
+            justify-content: center; /* center horizontally, again to fix centering */
+            color: rgb(0, 0, 0); /* text color is defined black to stand out better against the semi white bg */
+            text-align: center; /* centering text  */
+        }
+
+        .content {
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white background gives a cool effect */
+            padding: 20px; /* padding around the content  to make it neat*/
+            border-radius: 8px; /* rounded corners for aesthetic */
+            display: flex; /* use flexbox for layout again */
+            flex-direction: column; /* stack elements vertically to be cute */
+            align-items: center; /* center items horizontally for aesthetic */
+        }
+
+        .person {
+            display: flex; 
+            align-items: center; /* center items vertically */
+            margin: 10px 0; /* space between each person to be neat */
+            width: 100%; /* make it full width */
+        }
+
+        h1 { 
+            font-family: 'Lexend Giga', sans-serif; 
+            font-size: 32px; 
+            margin: 0; 
+        }
+
+        .person-info {
+            margin-left: 20px; /* space between image and text to be neat*/
+            text-align: left; /* left-align text */
+        }
+
+        img {
+            width: 80px; /* set a small size for the image to not take up alot of space */
+            height: auto; /* maintain height of picture to be good ratio */
+            border-radius: 50%; /* making the imagine circular to give that social media vibe XD */
+        }
+
+        p {
+            margin: 5px 0; /* adding space between */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>Meet the Creators</h1>
+
+        <div class="person">
+            <img src="summerolmstead.jpg" alt="Summer Olmstead"> <!-- putting my path to my image-->
+            <div class="person-info">
+                <h1>Summer Olmstead</h1>
+                <p> An undergraduate senior at UTC majoring in Computer Science: Data Science from Nashville, TN.</p>
+                <p> Her passions include coding, hiking, and baking. <3 </p>
+            </div>
+        </div>
+
+        <div class="person">
+            <img src="wyatt.png" alt="Wyatt"> <!-- path to Wyatt's image put in later -->
+            <div class="person-info">
+                <h1>Wyatt</h1>
+                <p>Short description about Wyatt.</p>
+            </div>
+        </div>
+
+        <div class="person">
+            <img src="kyle.png" alt="Kyle"> <!-- path to Kyle's image  put in ltr-->
+            <div class="person-info">
+                <h1>Kyle</h1>
+                <p>Short description about Kyle.</p>
+            </div>
+        </div>
+
+        <div class="person">
+            <img src="nandni.png" alt="Nandni"> <!-- path to Nandni's image put in ltr-->
+            <div class="person-info">
+                <h1>Nandni</h1>
+                <p>Short description about Nandni.</p>
+            </div>
+        </div>
+
+        <div class="person">
+            <img src="prisha.png" alt="Prisha"> <!-- path to Prisha's image  put in ltr-->
+            <div class="person-info">
+                <h1>Prisha</h1>
+                <p>Short description about Prisha.</p>
+            </div>
+        </div>
+        <a href="OriginalWebPage.html" class="back-link">Back to Main Page</a> <!-- back to main page to return to app :) -->
+    </div>
+
+</body>
+</html>
