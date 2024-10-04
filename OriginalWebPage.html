@@ -64,15 +64,15 @@
 
         /* Styling for the search box */
         .search-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            position: absolute; /* Position of the search box */
+            top: 20px; /* How high the box is on the page*/
+            right: 20px; /* How far right the box is on the page*/
             display: flex;
             align-items: center;
         }
 
         .search-container input, .search-container button {
-            padding: 10px;
+            padding: 10px;  /* space between input and button*/
             border: none;
             border-radius: 5px;
         }
@@ -82,11 +82,11 @@
         }
 
         .search-container button {
-            background-color: #1006c0;
+            background-color: #1006c0; /* color mocs blue*/
             color: white;
             cursor: pointer;
             margin-left: 10px;
-            margin-right:+4px;
+            margin-right:+4px; /* spacing between the search button and search text field/drop down box*/
         }
 
         .search-container button:hover {
@@ -123,7 +123,7 @@
             var cityInput = document.getElementById('cityInput').value;
 
             if (cityInput.toLowerCase() === 'chattanooga') {
-                window.location.href = 'Chattanooga.html'; // Replace with the actual page for Chattanooga
+                window.location.href = 'Chattanooga.html';
             } else {
                 alert('Please choose or type "Chattanooga".');
             }
