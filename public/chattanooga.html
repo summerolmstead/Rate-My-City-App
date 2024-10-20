@@ -5,34 +5,119 @@
 
 <!-- Basic CSS can sprouse up! :3  -->
 <style>
-
     body {
-        background-color: rgb(53, 53, 218);
-    }
+            background-image: url('chattanoogaNight.jpg');
+            background-size: cover;
+            background-position: center;
+            background-color: rgb(255, 255, 255);
+            margin: 0;
+            height: 100vh;
+            font-family: 'Georgia', sans-serif; 
+            font-size: 38px;
+        }
     h1 {
-        color: rgb(255, 255, 255);
+        margin-bottom: 20px;;
     }
-    .link {
-        display: block;
-        margin-top: 20px;
-        color: rgb(255, 255, 255);
-        text-decoration: none;
-        font-size: 20px;
-    }
-    .link:hover {
-        text-decoration: underline;
-    }
-</style>
 
+    .tab {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: ridge;
+            cursor: pointer;
+            padding: 0;
+            height: 200px;
+            width: 300px;
+            margin:0 10px;
+            border-radius: 15px;
+            transition: transform 0.3s;
+        }
+
+        .tab button:hover {
+            transform: scale(1.05);
+        }
+
+        .tab button:active {
+            outline: 4px solid white;
+        }
+
+        .tab #restaurantTab {
+            background-image: url('foodplace.jpg');
+        }
+        
+        .tab #eventTab { 
+            background-image: url('eventspics.jpg');
+        }
+
+        .tab #thingstodoTab { 
+            background-image: url('thingstodo.jpg');
+        }
+
+        .tabcontent.acive {
+            display: block;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .tabcontent.active{
+            display: block;
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</style>
 <body>
 
 <center>
 
 <h1>Chattanooga</h1>
-<!-- Made by Summer as an example, very basic tab link can make it cuter with css above when calling .link class lol-->
-<a href="RestaurantPage.html" class="link">Restaurants</a>
+<div class="tab">
+    <a href="RestaurantPage.html">
+        <button class="RestaurantPage.html" onclick="openTab(event, 'Restaurants')" id="restaurantTab"></button>
+
+    <a href="EventPage.html">
+        <button class="EventPage.html" onclick="openTab(event, 'Events')" id="eventTab"></button>
+    
+    <a href="ThingsToDoPage.html">
+        <button class="ThingsToDo.html" onclick="openTab(event, 'Things To Do')" id="thingstodoTab"></button>
+        
+    <a href="GroceryStoresPage.html">
+        <button class="GroceryStore.html" onclick="openTab(event, 'Things To Do')" id="thingstodoTab"></button>
+         
+    </a>
+</div>
 
 </center>
+<script>
+    function openTab(evt, tabName) {
+        
+        let tabcontent = document.getElementsByClassName("tabcontent");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        
+        }
+        
+        let tablinks = document.getElementsByClassName("tabcontent");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace("active", "");
+        }
 
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className +="active";
+    }
+
+    document.getElementById("resturantTab").click();
+    documnet.getElementById("eventTab").click();
+    document.getElementById("thingstodoTab").click();
+    document.getElementById("grocerystoresTab").click();
+
+</script>
 </body>
 </html>
