@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #d3bb59;
+    color: rgb(2, 1, 1);
+    padding: 10px 20px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline; /* Ensures items are in a row */
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: rgb(199, 35, 35); /* Link color */
+    text-decoration: none; /* Removes underline */
+}
+
+nav ul li a:hover {
+    text-decoration: underline; /* Underline on hover for better visibility */
+}
+
+main {
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #e34f4f;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+#place-list > div {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
