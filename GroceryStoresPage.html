@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Giga&family=Shippori+Mincho+B1:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('grocerypics.jpeg');
+            background-size: cover;
+            background-position: center; 
+            background-color: rgb(37, 42, 59);
+            margin: 0;
+            height: 100vh;
+            font-family: 'Lexend Giga', sans-serif; 
+        }
+        h1 {
+            color: rgb(255, 255, 255);
+        }
+
+        .tab {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            background-image: url('');
+            background-color: white;
+            border: ridge;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-family: 'Lexend Giga', sans-serif;
+        }
+
+        .tab button:hover {
+            background-color: rgb(0, 0, 0);
+        }
+
+        .tab button:active {
+            background-color: rgba(0,0,0,0.5);
+        }
+        .tabcontent.acive {
+            display: block;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .tabcontent.active{
+            display: block;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <h1>Grocery Stores</h1>
+        <p> For the Cheifs in the Family!!! </p>
+    </center>
+
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'WheretoGo')" id="defaultOpen">Where To Go </button>
+        <button class="tablinks" onclick="openTab(event, 'Organic')" id="defaultOpen">Organic </button>
+        <button class="tablinks" onclick="openTab(event, 'Best Price')" id="defaultOpen">best Price </button>
+    </div>
+
+    <div id="WhereToGo" class="tabcontent">
+        <h2>Where To Go</h2>
+        <p>These are the hottest places in Chattanooga to be at!! ;)</p>
+    </div>
+
+    <div id="Organic" class="tabcontent">
+    <h2>Organic</h2>
+    <p>If you are an inside type person well Chattanooga has some palces fro you to stay dry and out of the heat of Tennessee!!!</p>
+    </div>
+
+    <div id="Best Price" class="tabcontent">
+        <h2>Best Price</h2>
+        <p>If you like the outdoors well Chattanooga is the place to be!!!</p>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            
+            }
+            
+            let tablinks = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("active", "");
+            }
+
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className +="active";
+        }
+
+        document.getElementById("defaultOpen").click();
+    </script>
+
+</body>
+</html>

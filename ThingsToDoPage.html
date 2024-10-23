@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Giga&family=Shippori+Mincho+B1:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lexend Giga', sans-serif;
+            background-color: #fff;
+        }
+
+        .banner {
+        position: relative;
+        background-image: url('');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgb(0, 0, 0);
+        }
+
+        .overlap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0 ,0, 0, 0.5);
+        }
+
+        .content {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            background-color: rgba(225, 255, 255, 255, 0.8);
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: transform 0.3s, background-color 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+            color: #544a24;
+        
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            color: black;
+            background-color: #ffffff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        p {
+            font-size: 20px;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+<body>
+    
+    <div classs="banner">
+        <div class="overlay"></div>
+        <div class="content"></div>
+        <center>
+            <h1>Activities</h1>
+            <p> The thing to do in Chattanooga is only a few keystrokes away!!! </p>
+        </center>
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'WheretoGo')" id="defaultOpen">Where to Go </button>
+                <button class="tablinks" onclick="openTab(event, 'Indoor')" id="defaultOpen">Indoor </button>
+                <button class="tablinks" onclick="openTab(event, 'Outdoor')" id="defaultOpen">Outdoor </button>
+                <button class="tablinks" onclick="openTab(event, 'Hiking')" id="defaultOpen">Hiking </button>
+                <button class="tablinks" onclick="openTab(event, 'FriendsandFamily')" id="defaultOpen">Friends and Family </button>
+            </div>
+        </div>
+    </div>
+    <div id="WheretoGo" class="tabcontent">
+        <h2>Where to Go</h2>
+         <p>If you are an inside type person well Chattanooga has some palces fro you to stay dry and out of the heat of Tennessee!!!</p>
+    </div>
+    <div id="Indoor" class="tabcontent">
+        <h2>Indoor</h2>
+         <p>If you are an inside type person well Chattanooga has some palces fro you to stay dry and out of the heat of Tennessee!!!</p>
+    </div>
+
+    <div id="Outdoor" class="tabcontent">
+        <h2>Outdoor</h2>
+        <p>If you like the outdoors well Chattanooga is the place to be!!!</p>
+    </div>
+
+    <div id="Hiking" class="tabcontent">
+        <h2>Hiking</h2>
+        <p>If you like the outdoors well Chattanooga is the place to be!!!</p>
+    </div>
+
+    <div id="FriendsandFamily" class="tabcontent">
+        <h2>Friends and Family</h2>
+        <p>If you like the outdoors well Chattanooga is the place to be!!!</p>
+
+    </div>    
+
+    <script>
+        function openTab(evt, tabName) {
+            
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            
+            }
+            
+            let tablinks = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("active", "");
+            }
+
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className +="active";
+        }
+
+        document.getElementById('deafaultOpen').click();
+    </script>
+
+</body>
+</html>
