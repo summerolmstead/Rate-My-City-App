@@ -5,8 +5,8 @@ body {
 }
 
 header {
-    background-color: #d3bb59;
-    color: rgb(2, 1, 1);
+    background-color: #f9d718;
+    color: rgb(0, 0, 0);
     padding: 10px 20px;
 }
 
@@ -21,7 +21,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: rgb(199, 35, 35); /* Link color */
+    color: rgb(35, 32, 32); /* Link color */
     text-decoration: none; /* Removes underline */
 }
 
@@ -36,15 +36,40 @@ main {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #e34f4f;
+    background-color: #074081;
     position: relative;
     bottom: 0;
     width: 100%;
+    color:aliceblue
+}
+/* Scrollable Image Section */
+.image-scroll {
+    overflow-x: scroll;
+    white-space: nowrap;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+}
+
+.image-container {
+    display: inline-flex;
+}
+
+.image-container img {
+    height: 300px;
+    margin-right: 10px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.image-container img:hover {
+    transform: scale(1.1); /* Zoom effect on hover */
 }
 
 #place-list > div {
     margin-bottom: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     padding: 10px;
     border-radius: 5px;
 }
