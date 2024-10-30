@@ -9,11 +9,34 @@ const cors = require('cors');
 //initialize express app
 const app = express();
 const PORT = process.env.PORT || 3307; // using port 3307 bc summer knows it works 
+//to fetch user data need middleware security to fetch from frontend to backend!
+const session = require('express-session');
+const passport = require('passport');
 
 //middleware
 app.use(bodyParser.json()); //parse JSON bodies
 app.use(cors()); //enable CORS for all requests
 app.use(express.static('public')); //serve static files from 'public' directory
+app.use(session({ //fetching middleware
+    secret: 'yourSecretKey',
+    resave: false,
+    saveUninitialized: true
+}));
+
+//initialize passport.js to use under 
+app.use(passport.initialize());
+app.use(passport.session());
+
+//successful authentication using packages to communicate for middleware NEED
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+passport.deserializeUser(async (id, done) => {
+    const user = await User.findById(id);
+    done(null, user);
+});
+
+
 
 //MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, { 
@@ -23,6 +46,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 //if connection works or doesnt connect
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
+
+
 
 //HTML app redirects to diff pages !
 //serve the HTML file on the root URL
@@ -37,9 +62,29 @@ app.get('/signup', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/public/login.html');
 });
-//personalized user home page after login 
-app.get('/personaluser', (req, res) => {
-    res.sendFile(__dirname + '/public/personaluser.html');
+
+//personal user redirect w/ logic to authenticate users
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    return res.status(401).send('Unauthorized');
+}
+
+app.get('/personaluser', isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        res.json({ 
+            firstName: user.firstName, 
+            favorites: user.favorites || [] 
+        });
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).send('Error fetching user data');
+    }
 });
 //direct from search box to chattanooga page
 app.get('/chattanooga', (req, res) => {
@@ -53,9 +98,11 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true }, // Remember to hash passwords in production!
+    password: { type: String, required: true },
+    favorites: { type: [String], default: [] } //array of favorite items from website
 });
 
+//initalize user object to collect user data to store in userSchema
 const User = mongoose.model('User', userSchema);
 
 //API endpoint for user signup
@@ -84,21 +131,22 @@ app.post('/login', async (req, res) => {
 
     try {
         const user = await User.findOne({ username });
-        if (!user) {
+        if (!user || password !== user.password) {
             return res.status(400).send('Invalid username or password');
         }
 
-        //directly compare the provided password with the stored password
-        if (password !== user.password) {
-            return res.status(400).send('Invalid username or password');
-        }
-
-        res.status(200).send('Login successful');
+        // Set user in session
+        req.login(user, (err) => {
+            if (err) return res.status(500).send('Login error');
+            return res.status(200).send('Login successful');
+        });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).send('Error during login');
     }
 });
+
+
 
 //start the server!
 app.listen(PORT, () => {

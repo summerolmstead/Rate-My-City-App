@@ -1,3 +1,95 @@
-<html>
-    <p>testing</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #3c97a2; /* cute cyan color */
+            color: white;
+            height: 200px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            position: relative; 
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+        /* for later to call favorite added container*/
+        #favorites-container {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        .favorite-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .favorite-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="welcome-message">Welcome, <span id="user-name"></span>! :) </h1>
+        </header>
+        <main>
+            <h2>Your Favorites:</h2>
+            <div id="favorites-container">
+                <!-- summer said - put logic later for calling stuff here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- needed to add this to communicate to backend to fetch this for frontend-->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/personaluser');
+                const user = await response.json();
+
+                document.getElementById('user-name').innerText = user.firstName;
+
+                const favoritesContainer = document.getElementById('favorites-container');
+                user.favorites.forEach(item => {
+                    const favoriteItem = document.createElement('div');
+                    favoriteItem.className = 'favorite-item';
+                    favoriteItem.innerText = item;
+                    favoritesContainer.appendChild(favoriteItem);
+                });
+                //error handling!
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        });
+    </script>
+</body>
 </html>
+
