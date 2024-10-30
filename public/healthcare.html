@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Facilities in Chattanooga</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Chattanooga Healthcare Facilities</h1>
+        <nav>
+            <ul>
+                <li><a href="OriginalWebPage.html">Main Menu</a></li>
+                <li><a href="chattanooga.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="entertainment.html">Entertainment</a></li>
+                <li><a href="healthcare.html">Healthcare</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <main id="place-list">
+        <h2>Loading Healthcare Facilities...</h2>
+    </main>
+
+    <script>
+        const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac'; // Replace with your actual API key
+        const placeList = document.getElementById('place-list');
+
+        // Function to fetch healthcare facilities from Geoapify
+        async function loadHealthcare() {
+            try {
+                const response = await fetch(
+                    `https://api.geoapify.com/v2/places?categories=healthcare&filter=rect:-85.33620425557216,35.06807983992811,-85.29058867879202,35.023702962997724&limit=20&apiKey=${API_KEY}`
+                );
+                const data = await response.json();
+
+                placeList.innerHTML = ''; // Clear loading message
+
+                if (data.features.length > 0) {
+                    data.features.forEach((place) => {
+                        const name = place.properties.name || 'Name not available';
+                        const address = place.properties.address_line1 || 'Address not available';
+                        const phone = place.properties.phone || 'Phone number not available';
+
+                        const item = document.createElement('div');
+                        item.classList.add('place-item');
+                        item.innerHTML = `
+                            <h3>${name}</h3>
+                            <p>${address}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                        `;
+                        placeList.appendChild(item);
+                    });
+                } else {
+                    placeList.innerHTML = '<p>No healthcare facilities found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching healthcare data:', error);
+                placeList.innerHTML = '<p>Error loading healthcare facilities.</p>';
+            }
+        }
+
+        loadHealthcare(); // Call the function to load healthcare facilities
+    </script>
+    <footer>
+        <p>&copy; 2024 Chattanooga</p>
+    </footer>
+</body>
+</html>
