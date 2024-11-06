@@ -48,6 +48,7 @@
             text-overflow: ellipsis; /* Show ellipsis for overflow */
             display: flex;
             align-items: center;
+            max-width: 80%;
         }
 
         h2 {
@@ -86,9 +87,10 @@
        
         #user-name {
             display: inline-block;
-            max-width: 100px;
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .favorite-item {
@@ -119,21 +121,21 @@
     <!-- needed to add this to communicate to backend to fetch this for frontend-->
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-    // Check localStorage for firstName
-    const firstName = localStorage.getItem('firstName');
+    // clear perivous user data, had to clear cache if you signed in under another username
+    localStorage.removeItem('firstName');
 
-    if (firstName) {
-        // if firstName is found in localStorage, display it - Kyle
-        document.getElementById('user-name').innerText = firstName;
-    } else {
-        
-        try {
-            const response = await fetch('/personaluser');
+    try {
+        const response = await fetch('/personaluser', { cache: "no-store" });
+        if (response.ok) {
             const user = await response.json();
+            // present the first name from the user's information
             document.getElementById('user-name').innerText = user.firstName;
-        } catch (error) {
-            console.error('Error fetching user data:', error);
+            localStorage.setItem('firstName', user.firstName);
+        } else {
+            console.error('Error: Unable to fetch user data.');
         }
+    }   catch (error) {
+        console.error('Error fetching user data:', error);
     }
 }); 
 
