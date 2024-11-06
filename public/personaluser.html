@@ -120,22 +120,29 @@
 
     <!-- needed to add this to communicate to backend to fetch this for frontend-->
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-    // clear perivous user data, had to clear cache if you signed in under another username
-    localStorage.removeItem('firstName');
-
-    try {
-        const response = await fetch('/personaluser', { cache: "no-store" });
-        if (response.ok) {
-            const user = await response.json();
-            // present the first name from the user's information
-            document.getElementById('user-name').innerText = user.firstName;
-            localStorage.setItem('firstName', user.firstName);
-        } else {
-            console.error('Error: Unable to fetch user data.');
+   document.addEventListener('DOMContentLoaded', async () => {
+    
+    // see if firstName exists in storage
+    const storedName = localStorage.getItem('firstName');
+    if (storedName) {
+        // if there is a first name store it
+        document.getElementById('user-name').innerText = storedName;
+    } else {
+        // if there is no name, fetch it from the database
+        try {
+            const response = await fetch('/personaluser', { cache: "no-store" });
+            if (response.ok) {
+                const user = await response.json();
+                // show name
+                document.getElementById('user-name').innerText = user.firstName;
+                // store first name
+                localStorage.setItem('firstName', user.firstName);
+            } else {
+                console.error('Error: Unable to fetch user data.');
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
         }
-    }   catch (error) {
-        console.error('Error fetching user data:', error);
     }
 }); 
 
