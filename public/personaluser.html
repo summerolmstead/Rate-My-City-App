@@ -19,30 +19,76 @@
             padding: 20px;
         }
         header {
-            background-color: #3c97a2; /* cute cyan color */
-            color: white;
-            height: 200px; 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
+            background-color: #f9d718;
+            color: rgb(0, 0, 0);
+            height: 100px; 
+            width: 100%;
+            display: flex;
             align-items: center; 
-            text-align: center; 
-            position: relative; 
+            padding: 0 20px; /* padding on the left and right */
+            position: fixed; /* make header fixed at the top */
+            top: 0; /* position it at the top */
+            left: 0; /* align to the left */
+            z-index: 1000; /* ensure it is on top of other content */
+            box-sizing: border-box;
+
+        }
+       
+        .container {
+            max-width: 800px;
+            margin: 120px auto 0; /* prevents overlap with fixed header */
+            padding: 20px;
         }
 
         h1 {
             margin: 0;
+            max-width: 40%;
+            white-space: nowrap; /* Prevent the text from wrapping */
+            overflow: hidden; /* Hide overflow if too long */
+            text-overflow: ellipsis; /* Show ellipsis for overflow */
+            display: flex;
+            align-items: center;
         }
 
         h2 {
             margin-top: 20px;
         }
+
+        .logo {
+            height: 75px; 
+            width: 75px; 
+            border-radius: 50%; /* make the logo circular */
+            object-fit: cover; 
+            margin-right: 20px;
+        }
+
+        
+        .menu {
+            margin-right: auto; /* space between the logo and the menu */
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu:hover {
+            text-decoration: underline;
+        }
+
         /* for later to call favorite added container*/
         #favorites-container {
             margin-top: 10px;
             padding: 10px;
             border: 1px solid #ddd;
             background-color: #fff;
+        }
+       
+        #user-name {
+            display: inline-block;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .favorite-item {
@@ -58,7 +104,9 @@
 <body>
     <div class="container">
         <header>
-            <h1 id="welcome-message">Welcome, <span id="user-name"></span>! :) </h1>
+            <img src="logo.jpeg" alt="Logo" class="logo">
+            <a href="OriginalWebPage.html" class="menu">Main Menu</a>
+            <h1 id="welcome-message">Welcome, <span id="user-name"></span> ! :) </h1>
         </header>
         <main>
             <h2>Your Favorites:</h2>
@@ -71,24 +119,24 @@
     <!-- needed to add this to communicate to backend to fetch this for frontend-->
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('/personaluser');
-                const user = await response.json();
+    // Check localStorage for firstName
+    const firstName = localStorage.getItem('firstName');
 
-                document.getElementById('user-name').innerText = user.firstName;
+    if (firstName) {
+        // if firstName is found in localStorage, display it - Kyle
+        document.getElementById('user-name').innerText = firstName;
+    } else {
+        
+        try {
+            const response = await fetch('/personaluser');
+            const user = await response.json();
+            document.getElementById('user-name').innerText = user.firstName;
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    }
+}); 
 
-                const favoritesContainer = document.getElementById('favorites-container');
-                user.favorites.forEach(item => {
-                    const favoriteItem = document.createElement('div');
-                    favoriteItem.className = 'favorite-item';
-                    favoriteItem.innerText = item;
-                    favoritesContainer.appendChild(favoriteItem);
-                });
-                //error handling!
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        });
     </script>
 </body>
 </html>
