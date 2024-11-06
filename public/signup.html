@@ -78,6 +78,7 @@
             });
             //if sign up to database was successful or not
             if (response.ok) {
+                localStorage.setItem('firstName', firstName);
                 alert('Sign up successful!');
                 window.location.href = 'personaluser.html'; //redirect to the a users personal own page :p
             } else {
