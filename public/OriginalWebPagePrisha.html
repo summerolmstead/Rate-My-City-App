@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Your City</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lora:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #d3e1c7;
+            background-image: url('chattanooga_sketch.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .banner {
+            width: 100%;
+            background-color: rgba(125, 159, 109, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .banner h1 {
+            font-family: 'Lora', serif;
+            font-size: 28px;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container input {
+            padding: 8px;
+            border: 1px solid #6f8a56;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 200px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-container button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #6f8a56;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .search-container button:hover {
+            background-color: #4e6e47;
+            color: #ffffff;
+        }
+
+        .auth-buttons button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #6f8a56;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .auth-buttons button:hover {
+            background-color: #4e6e47;
+            color: #ffffff;
+        }
+
+        .content {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .content h2 {
+            font-family: 'Lora', serif;
+            font-size: 36px;
+            color: #7d9f6d;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .content img {
+            max-width: 80%;
+            height: auto;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background-color: rgba(211, 225, 199, 0.8);
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer button {
+            padding: 10px;
+            background-color: #7d9f6d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .footer button:hover {
+            background-color: #6f8a56;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="banner">
+        <h1>Rate Your City</h1>
+        <div class="search-container">
+            <input list="cities" id="cityInput" placeholder="Select or search for a city...">
+            <datalist id="cities">
+                <option value="Chattanooga">
+            </datalist>
+            <button onclick="searchCity()">Search</button>
+        </div>
+        <div class="auth-buttons">
+            <button onclick="location.href='signup.html'">Sign Up</button>
+            <button onclick="location.href='login.html'">Log In</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Welcome to Rate Your City!</h2>
+        <p>This is the app that allows you to see the ranking of popular restaurants, grocery stores, events, and entertainment spots here in Chattanooga.</p>
+        <p>This is currently the demo version. We are only offering Chattanooga, TN at the moment, and we hope to implement other nearby cities in the future.</p>
+        
+        <!-- Inserted Image -->
+        <img src="chattanooga-outline-solid-black.png" alt="Chattanooga City Outline">
+    </div>
+
+    <div class="footer">
+        <button onclick="location.href='MeetTheCreators.html'">Meet the Creators</button>
+    </div>
+
+    <script>
+        function searchCity() {
+            var cityInput = document.getElementById('cityInput').value;
+            if (cityInput.toLowerCase() === 'chattanooga') {
+                window.location.href = 'chattanooga.html';
+            } else {
+                alert('Choose or type a city.');
+            }
+        }
+    </script>
+
+</body>
+</html>
