@@ -121,21 +121,23 @@
     <!-- needed to add this to communicate to backend to fetch this for frontend-->
     <script>
    document.addEventListener('DOMContentLoaded', async () => {
-    
-    // see if firstName exists in storage
+    // Clear the firstName from localStorage if you just logged in or after signup
+    localStorage.removeItem('firstName');
+
+    // Check if firstName is already stored in localStorage
     const storedName = localStorage.getItem('firstName');
     if (storedName) {
-        // if there is a first name store it
+        // If the name is in localStorage, display it
         document.getElementById('user-name').innerText = storedName;
     } else {
-        // if there is no name, fetch it from the database
+        // If no name in localStorage, fetch it from the backend
         try {
             const response = await fetch('/personaluser', { cache: "no-store" });
             if (response.ok) {
                 const user = await response.json();
-                // show name
+                // Display the first name
                 document.getElementById('user-name').innerText = user.firstName;
-                // store first name
+                // Store the first name in localStorage for future use
                 localStorage.setItem('firstName', user.firstName);
             } else {
                 console.error('Error: Unable to fetch user data.');
@@ -144,7 +146,8 @@
             console.error('Error fetching user data:', error);
         }
     }
-}); 
+});
+ 
 
     </script>
 </body>
