@@ -17,8 +17,8 @@
                 <li><a href="hotels.html">Hotels</a></li>
                 <li><a href="entertainment.html">Entertainment</a></li>
                 <li><a href="healthcare.html">Healthcare</a></li>
-
             </ul>
+        </nav>
     </header>
 
     <main id="place-list">
@@ -26,7 +26,7 @@
     </main>
 
     <script>
-        const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac'; // Replace with your actual Geoapify API key
+        const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac'; // Your Geoapify API key
         const placeList = document.getElementById('place-list');
 
         // Function to fetch restaurants from Geoapify API
@@ -46,17 +46,91 @@
                         const city = place.properties.city || 'City not available';
                         const phone = place.properties.phone || 'Phone number not available';
                         const website = place.properties.website || 'Website not available';
+                        
+                        // Initializing the rating as empty
+                        const initialRating = 0;
 
                         const item = document.createElement('div');
                         item.classList.add('place-item');
-                        item.innerHTML = `
+                        item.innerHTML = ` 
                             <h3>${name}</h3>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
                             <p><strong>City:</strong> ${city}</p>
                             <p><strong>Phone:</strong> ${phone}</p>
                             <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
+                            <div>
+                                <strong>Rating: </strong>
+                                <div id="rating-${place.properties.place_id}" class="stars">${renderStars(initialRating)}</div>
+                            </div>
+
+                            <h4>Comments:</h4>
+                            <ul id="comments-list-${place.properties.place_id}">
+                                <!-- Comments will go here -->
+                            </ul>
+
+                            <form id="rating-form-${place.properties.place_id}">
+                                <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
+                                <button type="submit">Submit Rating</button>
+                            </form>
+
+                            <form id="comment-form-${place.properties.place_id}">
+                                <textarea name="comment" placeholder="Your comment here..." required></textarea>
+                                <button type="submit">Submit Comment</button>
+                            </form>
                         `;
                         placeList.appendChild(item);
+
+                        // Handle rating form submission
+                        document.getElementById(`rating-form-${place.properties.place_id}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const rating = event.target.rating.value;
+                            const placeId = place.properties.place_id; // Ensure you get the correct placeId
+
+                            // Check if the placeId is valid (MongoDB expects a 24-character hex string for ObjectId)
+                            if (typeof placeId !== 'string' || placeId.length !== 24) {
+                                alert('Invalid place ID!');
+                                return;
+                            }
+
+                            const response = await fetch(`/rate/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ rating })
+                            });
+
+                            if (response.ok) {
+                                alert('Rating submitted successfully!');
+                                loadRestaurants(); // Refresh the restaurant list
+                            } else {
+                                alert('Error submitting rating');
+                            }
+                        });
+
+                        // Handle comment form submission
+                        document.getElementById(`comment-form-${place.properties.place_id}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const comment = event.target.comment.value;
+                            const placeId = place.properties.place_id; // Ensure you get the correct placeId
+
+                            const response = await fetch(`/comment/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ text: comment })
+                            });
+
+                            if (response.ok) {
+                                alert('Comment posted successfully!');
+                                loadRestaurants(); // Refresh the restaurant list
+                            } else {
+                                alert('Error posting comment');
+                            }
+                        });
+
+                        // Optionally: Fetch and display previous ratings/comments (if available in the DB)
                     });
                 } else {
                     placeList.innerHTML = '<p>No restaurants found.</p>';
@@ -67,7 +141,29 @@
             }
         }
 
-        loadRestaurants(); // Call the function to load restaurant data
+        // Function to render stars (empty initially, based on rating)
+        function renderStars(rating) {
+            const stars = [];
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+            for (let i = 0; i < fullStars; i++) {
+                stars.push('★');
+            }
+            if (halfStar) stars.push('☆');
+            for (let i = 0; i < emptyStars; i++) {
+                stars.push('☆');
+            }
+
+            return stars.join('');
+        }
+
+        loadRestaurants(); // Initial call to load restaurants
     </script>
 </body>
 </html>
+
+
+
+
