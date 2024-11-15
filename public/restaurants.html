@@ -80,51 +80,51 @@
                             </form>
                         `;
                         placeList.appendChild(item);
+                      
+                        
+                        //handle rating form submission
+                        document.getElementById(`rating-form-${place.properties.place_id}`).addEventListener('submit', async (event) => {
+                        event.preventDefault();
+                        const rating = event.target.rating.value;  //get rating value from input
+                        const placeId = place.properties.place_id;  //get place ID
 
-                        // Handle rating form submission
-                        // Handle rating form submission
-document.getElementById(`rating-form-${place.properties.place_id}`).addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const rating = event.target.rating.value;  // Get rating value from input
-    const placeId = place.properties.place_id;  // Get place ID
+                        //validate that placeId is a non-empty string
+                        if (typeof placeId !== 'string' || placeId.trim() === '') {
+                            alert('Invalid place ID!');
+                            return;
+                        }
 
-    // Validate that placeId is a non-empty string
-    if (typeof placeId !== 'string' || placeId.trim() === '') {
-        alert('Invalid place ID!');
-        return;
-    }
+                        console.log('Submitting rating for place ID:', placeId);
 
-    console.log('Submitting rating for place ID:', placeId);
+                        const response = await fetch(`/rate/${placeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ rating })  //send the rating in the body
+        });
 
-    const response = await fetch(`/rate/${placeId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rating })  // Send the rating in the body
-    });
-
-    if (response.ok) {
-        alert('Rating submitted successfully!');
+                        if (response.ok) {
+                            alert('Rating submitted successfully!');
         
-        // Get the updated place data (including the new rating)
-        const updatedPlace = await response.json();
+                        //get the updated place data (including the new rating)
+                            const updatedPlace = await response.json();
 
-        // Now update the stars for this specific place
-        const starsContainer = document.getElementById(`rating-${placeId}`);
-        starsContainer.innerHTML = renderStars(updatedPlace.ratings.reduce((acc, rating) => acc + rating.rating, 0) / updatedPlace.ratings.length);  // Calculate average rating
+                        //now update the stars for this specific place
+                            const starsContainer = document.getElementById(`rating-${placeId}`);
+                            starsContainer.innerHTML = renderStars(updatedPlace.ratings.reduce((acc, rating) => acc + rating.rating, 0) / updatedPlace.ratings.length);  // Calculate average rating
         
-    } else {
-        alert('Error submitting rating');
-    }
-});
+                        } else {
+                            alert('Error submitting rating');
+                        }
+                    });
 
 
                         // Handle comment form submission
                         document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
                             const comment = event.target.comment.value;
-                            const placeId = placeId; // Ensure you get the correct placeId
+                            const placeId = placeId; //ensure you get the correct placeId
 
                             const response = await fetch(`/comment/${placeId}`, {
                                 method: 'POST',
@@ -160,18 +160,18 @@ function renderStars(rating) {
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
     for (let i = 0; i < fullStars; i++) {
-        stars.push('★');  // Full stars
+        stars.push('★');  //full stars
     }
-    if (halfStar) stars.push('☆');  // Half star
+    if (halfStar) stars.push('☆');  //half star
     for (let i = 0; i < emptyStars; i++) {
-        stars.push('☆');  // Empty stars
+        stars.push('☆');  //empty stars
     }
 
     return stars.join('');
 }
 
 
-        loadRestaurants(); // Initial call to load restaurants
+        loadRestaurants(); //initial call to load restaurants
     </script>
 </body>
 </html>

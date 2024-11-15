@@ -232,25 +232,25 @@ app.post('/rate/:placeId', async (req, res) => {
 
 // API endpoint for submitting a comment -summer
 app.post('/comment/:placeId', async (req, res) => {
-    const { placeId } = req.params;  // Extract placeId from the URL
-    const { comment } = req.body;    // Get comment text from the request body
+    const { placeId } = req.params;  //extract placeId from the URL
+    const { comment } = req.body;    //get comment text from the request body
 
-    // Assuming the user is authenticated and we have the userId
+    //assuming the user is authenticated and we have the userId
     const userId = req.user._id;
 
-    // Validate inputs
+    //validate inputs
     if (!placeId || !comment || !userId) {
         return res.status(400).json({ error: 'Place ID, comment, and user ID are required' });
     }
 
     try {
-        // Check if place already exists in the database by placeId
+        //check if place already exists in the database by placeId (is in )
         let place = await Place.findOne({ placeId });
 
         if (!place) {
             console.log(`Place with placeId ${placeId} not found, creating a new place.`);
             
-            // Fetch place details from Geoapify API (optional)
+            //fetch place details from Geoapify API (optional)
             const geoapifyApiKey = '4dee9244ca9041a8a882f81b760bc3ac';
             const geoapifyUrl = `https://api.geoapify.com/v2/places/${placeId}?apiKey=${geoapifyApiKey}`;
             
@@ -261,14 +261,14 @@ app.post('/comment/:placeId', async (req, res) => {
                 return res.status(404).json({ error: 'Place not found in Geoapify' });
             }
 
-            // Extract place details from Geoapify API response with safe checks
+            //extract place details from Geoapify API response with safe checks
             const placeData = data.features[0]?.properties || {};
 
             const name = placeData.name || 'Unknown Place';
             const address = placeData.address_line1 || 'Unknown Address';
             const category = placeData.categories?.[0] || 'Unknown Category';
 
-            // Create a new place document if it doesn't exist
+            //create a new place document if it doesn't exist in database yet
             place = new Place({
                 placeId,                          // Use Geoapify's placeId
                 name,                             // Get name from Geoapify
@@ -278,7 +278,7 @@ app.post('/comment/:placeId', async (req, res) => {
                 comments: []
             });
 
-            // Save the new place to the database
+            //save the new place to the database
             await place.save();
             console.log(`New place created with placeId ${placeId}`);
         }
@@ -290,7 +290,7 @@ app.post('/comment/:placeId', async (req, res) => {
             createdAt: new Date()    // Automatically set the creation date
         });
 
-        // Save the updated place with the new comment
+        //save the updated place with the new comment
         await place.save();
 
         res.status(200).json({ message: 'Comment posted successfully!' });
@@ -307,7 +307,7 @@ app.post('/comment/:placeId', async (req, res) => {
 app.get('/test', async (req, res) => {
     try {
         const user = await User.findOne({ username: 'testuser' });
-        res.json(user); // Should return user data if found
+        res.json(user); //should return user data if found
     } catch (error) {
         res.status(500).send('Error accessing database');
     }
