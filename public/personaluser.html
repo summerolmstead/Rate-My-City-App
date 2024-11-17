@@ -102,8 +102,11 @@
             border-bottom: none;
         }
         .search-container {
+            margin: 0 auto;
             display: flex;
             align-items: center;
+            flex-grow: 1;
+            justify-content: center;
         }
 
         .search-container input {
@@ -144,7 +147,7 @@
                 </datalist>
                 <button onclick="searchCity()">Search</button>
             </div>
-            <h1 id="welcome-message">Welcome, <span id="user-name"></span> </h1>
+            <h1 id="welcome-message">Welcome,<span id="user-name"></span> </h1>
         </header>
         <main>
             <h2>Your Favorites:</h2>
