@@ -1,4 +1,3 @@
-// server.js
 require('dotenv').config(); // Load environment variables
 
 // Import required packages
@@ -8,6 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
+const fetch = require('node-fetch');  // This works fine with v2.x
 
 // Import the already defined models
 const Place = require('./models/Place');  // Already defined in models/Place.js
@@ -76,37 +76,93 @@ app.get('/chattanooga', (req, res) => {
     res.sendFile(__dirname + '/public/chattanooga.html');
 });
 
-// API endpoint for getting places (including places with no ratings)
 app.get('/restaurants', async (req, res) => {
     try {
-        // Fetch all places from the database
-        const places = await Place.find({}).populate('ratings.user');  // Populate ratings with user details
+      // Fetch places where category is 'catering.restaurant'
+      const restaurants = await Place.find({ category: 'catering.restaurant' });
+  
+      if (restaurants.length > 0) {
+        res.json(restaurants);
+      } else {
+        res.status(404).json({ message: 'No restaurants found.' });
+      }
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+      res.status(500).json({ message: 'Error fetching restaurants.' });
+    }
+  });
 
-        // Iterate over the places and check if their names are "Unknown Place"
-        for (let place of places) {
-            if (place.name === "Unknown Place") {
-                // If the place has no real data, fetch it from the API
-                const placeData = await fetchPlaceDataFromAPI(place.placeId);
-                
-                // Update the place with real data
-                place.name = placeData.name;
-                place.address = placeData.address;
-                place.city = placeData.city;
-                place.phone = placeData.phone;
-                place.website = placeData.website;
-                
-                // Save the updated place to the database
-                await place.save();
+const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac';  // Your Geoapify API key
+
+async function fetchAndStorePlacesForCategory(category) {
+    try {
+        console.log(`Fetching places for category: ${category}`); // Log the start of fetching
+        
+        // Set the latitude and longitude (for example, Chattanooga, TN)
+        const lat = 35.0456;
+        const lon = -85.3097;
+
+        // API request URL for Geoapify Places API with a specific category like 'catering.restaurant.pizza'
+        const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
+        console.log(`Requesting API URL: ${apiUrl}`); // Log the actual API request URL
+
+        // Fetch the data from the Geoapify API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Debugging the raw API response
+        console.log('Raw API Response:', data); // Log the raw response from Geoapify
+
+        // Check if we got valid data
+        if (!data || !data.features || data.features.length === 0) {
+            console.log(`No places found for category: ${category}`);
+            return;
+        }
+
+        // Loop through the fetched places and save them to MongoDB
+        for (let placeData of data.features) {
+            const place = placeData.properties;
+
+            // Log each place being processed
+            console.log(`Processing place: ${place.name || 'Unnamed Place'}, ID: ${place.place_id}`);
+
+            // Check if the place already exists in the database
+            const existingPlace = await Place.findOne({ placeId: place.place_id });
+
+            // Log whether the place already exists or needs to be created
+            if (existingPlace) {
+                console.log(`Place already exists in the database: ${place.name}`);
+            } else {
+                console.log(`Creating new place: ${place.name || 'Unnamed Place'}`);
+
+                // If the place doesn't exist, create and save it
+                const newPlace = new Place({
+                    placeId: place.place_id,
+                    name: place.name || "Unknown Name",
+                    address: place.address_line1 || "Unknown Address",
+                    city: place.city || "Unknown City",
+                    phone: place.phone || "Unknown Phone",
+                    website: place.website || "Unknown Website",
+                    category: category,  // Set the category (e.g., pizza restaurant)
+                    ratings: [],  // Initialize with empty ratings
+                    comments: []  // Initialize with empty comments
+                });
+
+                await newPlace.save();  // Save the new place to the database
+                console.log(`Created and saved new place: ${place.name}`);
             }
         }
 
-        res.status(200).json(places); // Send all places, even those with no ratings yet
-    } catch (err) {
-        console.error('Error fetching places:', err);
-        res.status(500).json({ error: 'Error fetching places' });
+        console.log(`Successfully fetched and stored places for category: ${category}`);
+    } catch (error) {
+        console.error('Error fetching and storing places:', error);
     }
-});
+}
 
+
+
+// Call this function once to populate your database with restaurant data
+//fetchAndStorePlacesForCategory('catering.restaurant');  // Fetch and store restaurants - summer successfully called YESSSSSS
 
 // API endpoint for user signup
 app.post('/signup', async (req, res) => {
@@ -142,13 +198,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Error during login');
     }
 });
-
-// Rating submission route (Check if user has already rated and update or create a new rating)
-// Assuming you are using fetch to interact with the Geoapify API or another API
-const fetch = require('node-fetch');
-
-// Your API Key for Geoapify or other external API
-const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac';
 
 // Function to fetch data from the external API
 async function fetchPlaceDataFromAPI(placeId) {
@@ -188,95 +237,66 @@ async function fetchPlaceDataFromAPI(placeId) {
     }
 }
 
-// Rating submission route (with real data fetched from API)
-app.post('/rate/:placeId', isAuthenticated, async (req, res) => {
-    const { placeId } = req.params;
-    const { rating } = req.body;
-    const user = req.user;  // The authenticated user
-
+// Rating submission route
+app.post('/rate', isAuthenticated, async (req, res) => {
+    const { placeId, rating, comment } = req.body;
     try {
-        // Check if the place already exists in the database
-        let place = await Place.findOne({ placeId });
-
+        const place = await Place.findOne({ placeId });
         if (!place) {
-            // If the place does not exist, fetch real data from the API
-            const placeData = await fetchPlaceDataFromAPI(placeId);
-
-            // Create a new place document with the fetched data
-            place = new Place({
-                placeId,
-                name: placeData.name,
-                address: placeData.address,
-                city: placeData.city,
-                phone: placeData.phone,
-                website: placeData.website,
-                ratings: [],  // Initialize as empty array for ratings
-                comments: []  // Initialize as empty array for comments
-            });
-
-            await place.save();
-            console.log(`Created new place with ID: ${placeId} and fetched data.`);
+            return res.status(404).send('Place not found');
         }
 
-        // Check if the user has already rated this place
-        const existingRating = place.ratings.find(r => r.user.toString() === user._id.toString());
-
-        if (existingRating) {
-            // If user has rated, update their rating
-            existingRating.rating = rating;
-            await place.save();
-            return res.status(200).send('Rating updated');
-        } else {
-            // If the user has not rated this place yet, create a new rating
-            place.ratings.push({ user: user._id, rating });
-            await place.save();
-            return res.status(201).send('Rating added');
-        }
-    } catch (error) {
-        console.error('Error submitting rating:', error);
-        return res.status(500).send('Error submitting rating');
-    }
-});
-
-
-// Comment submission route
-app.post('/comment/:placeId', isAuthenticated, async (req, res) => {
-    const { placeId } = req.params;
-    const { text } = req.body;
-    const user = req.user;  // The authenticated user
-
-    try {
-        // Check if the place already exists in the database
-        let place = await Place.findOne({ placeId });
-
-        if (!place) {
-            // If the place does not exist, create it with initialized fields
-            place = new Place({
-                placeId,
-                name: "Unknown Place",  // Placeholder name
-                address: "Unknown Address",  // Placeholder address
-                city: "Unknown City",  // Placeholder city
-                phone: "Unknown Phone",  // Placeholder phone
-                website: "Unknown Website",  // Placeholder website
-                ratings: [],  // Initialize as empty array for ratings
-                comments: []  // Initialize as empty array for comments
-            });
-            await place.save();
-            console.log(`Created new place with ID: ${placeId}`);
-        }
-
-        // Add the comment to the place
-        place.comments.push({ text, user: user._id });
+        // Add the rating and comment to the place's ratings array
+        place.ratings.push(rating);
+        place.comments.push(comment);
         await place.save();
 
-        return res.status(201).send('Comment added');
+        res.status(200).send('Rating submitted successfully');
     } catch (error) {
-        console.error('Error adding comment:', error);
-        return res.status(500).send('Error adding comment');
+        console.error('Error submitting rating:', error);
+        res.status(500).send('Error submitting rating');
     }
 });
+app.post('/rate/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { rating } = req.body;
+
+    try {
+        const place = await Place.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.ratings.push({ rating });  // Add the new rating
+        await place.save();
+        res.status(200).json({ message: 'Rating submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting rating' });
+    }
+});
+app.post('/comment/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
+
+    try {
+        const place = await Place.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.comments.push({ text });  // Add the new comment
+        await place.save();
+        res.status(200).json({ message: 'Comment submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting comment' });
+    }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+

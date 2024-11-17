@@ -1,21 +1,28 @@
+// models/Place.js
 const mongoose = require('mongoose');
 
-const placeSchema = new mongoose.Schema({
-    name: String,            // Restaurant or place name
-    address: String,         // Street address
-    city: String,            // City name
-    phone: String,           // Phone number
-    website: String,         // Website URL
-    placeId: String,         // Unique place identifier (e.g., from Geoapify)
-    ratings: [{
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        rating: Number,
-    }],
-    comments: [{
-        text: String,
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-    }],
+const PlaceSchema = new mongoose.Schema({
+    placeId: String,
+    name: String,
+    address: String,
+    city: String,
+    phone: String,
+    website: String,
+    ratings: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            rating: Number
+        }
+    ],
+    comments: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            text: String
+        }
+    ],
+    category: String  // Add the category field here to store the category (e.g., "restaurant", "hotel")
 });
 
-const Place = mongoose.model('Place', placeSchema);
-module.exports = Place;
+module.exports = mongoose.model('Place', PlaceSchema);
+
+

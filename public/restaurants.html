@@ -67,13 +67,10 @@
     </main>
 
     <script>
-        const API_KEY = '4dee9244ca9041a8a882f81b760bc3ac';  // Your Geoapify API key
         const placeList = document.getElementById('place-list');
 
-        // Function to fetch restaurants from Geoapify API
-        // Function to fetch restaurants from Geoapify API
-        // Function to fetch and display restaurants
-async function loadRestaurants() {
+        // Function to fetch restaurants from the server
+        async function loadRestaurants() {
     try {
         const response = await fetch('/restaurants');
         const places = await response.json();
@@ -124,19 +121,17 @@ async function loadRestaurants() {
                 `;
                 placeList.appendChild(item);
 
-                // Event listeners for rating and comment forms (as before)
-                // Rating form submission logic
+                // Event listeners for rating and comment forms
                 document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
                     event.preventDefault();
-                    const rating = event.target.rating.value;  // Get rating value from input
-                    const placeId = placeId;
+                    const rating = event.target.rating.value;
 
                     const response = await fetch(`/rate/${placeId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ rating })  // Send the rating in the body
+                        body: JSON.stringify({ rating })
                     });
 
                     if (response.ok) {
@@ -147,11 +142,9 @@ async function loadRestaurants() {
                     }
                 });
 
-                // Comment form submission logic (same as before)
                 document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
                     event.preventDefault();
                     const comment = event.target.comment.value;
-                    const placeId = placeId;
 
                     const response = await fetch(`/comment/${placeId}`, {
                         method: 'POST',
@@ -179,38 +172,27 @@ async function loadRestaurants() {
 }
 
 
+        // Function to render stars with full, half, and empty stars using CSS classes
+        function renderStars(rating) {
+            const stars = [];
 
-// Function to render stars with full, half, and empty stars using CSS classes
-function renderStars(rating) {
-    const stars = [];
-    
-    // If no rating is found or rating is zero, default to empty stars
-    if (rating === 0 || rating == null) {
-        rating = 0;  // Ensure zero rating is treated as empty stars
-    }
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
-    const fullStars = Math.floor(rating);  // Full stars (integer part of rating)
-    const halfStar = rating % 1 >= 0.5;   // Half star if there's a remainder (0.5 or higher)
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);  // Remaining empty stars
+            for (let i = 0; i < fullStars; i++) {
+                stars.push('<div class="star full"></div>');
+            }
 
-    // Add full stars
-    for (let i = 0; i < fullStars; i++) {
-        stars.push('<div class="star full"></div>');  // Full yellow star
-    }
+            if (halfStar) stars.push('<div class="star half"></div>');
+            for (let i = 0; i < emptyStars; i++) {
+                stars.push('<div class="star empty"></div>');
+            }
 
-    // Add half star (if applicable)
-    if (halfStar) stars.push('<div class="star half"></div>');  // Half yellow star
+            return stars.join('');
+        }
 
-    // Add empty stars
-    for (let i = 0; i < emptyStars; i++) {
-        stars.push('<div class="star empty"></div>');  // Empty star (gray)
-    }
-
-    return stars.join('');  // Join and return all star elements as HTML
-}
-
-
-        loadRestaurants(); // Initial call to load restaurants
+        loadRestaurants();  // Initial call to load restaurants
     </script>
 </body>
 </html>
