@@ -1,82 +1,57 @@
-//welcome to the server javascript - this is where the app handles redirects and has the middle and backend defined
-require('dotenv').config(); //load environment variables - summer put connection string to database
+// server.js
+require('dotenv').config(); // Load environment variables
 
-//import required packages
+// Import required packages
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-//initialize express app
-const app = express();
-const PORT = process.env.PORT || 3307; // using port 3307 bc summer knows it works 
-//to fetch user data need middleware security to fetch from frontend to backend!
 const session = require('express-session');
 const passport = require('passport');
 
-//db tables exported
-const Place = require('./models/Place'); 
-const User = require('./models/User'); // Import the User model
+// Import the already defined models
+const Place = require('./models/Place');  // Already defined in models/Place.js
+const User = require('./models/User');    // Already defined in models/User.js
 
-//middleware
-app.use(bodyParser.json()); //parse JSON bodies
-app.use(cors()); //enable CORS for all requests
-app.use(express.static('public')); //serve static files from 'public' directory
+// Initialize the Express app
+const app = express();
+const PORT = process.env.PORT || 3307;
 
+// Middleware setup
+app.use(bodyParser.json());
+app.use(cors());
+app.use(express.static('public'));
+
+// Session and Passport middleware setup
 app.use(session({
     secret: 'yourSecretKey',
     resave: false,
     saveUninitialized: true,
     cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production' }
 }));
-
-
-//initialize passport.js to use under 
 app.use(passport.initialize());
 app.use(passport.session());
 
-//successful authentication using packages to communicate for middleware NEED
+// Passport serialize/deserialize user setup
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
-    console.log('Deserialized user:', user); // Add debug log to check if the user is deserialized properly
     done(null, user);
 });
 
-//passport.deserializeUser(async (id, done) => {
- //   const user = await User.findById(id);
-  //  done(null, user);
-//});
-
-
-
-//MongoDB connection
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true 
-})
-//if connection works or doesnt connect
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
-
-
-
-//HTML app redirects to diff pages !
-//serve the HTML file on the root URL
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/OriginalWebPage.html');
-});
-//direct to signup page
-app.get('/signup', (req, res) => {
-    res.sendFile(__dirname + '/public/signup.html');
-});
-//direct to login page
-app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/public/login.html');
+}).then(() => {
+    console.log('MongoDB connected');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
 });
 
-//personal user redirect w/ logic to authenticate users
+// Middleware for authentication check
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -84,82 +59,58 @@ function isAuthenticated(req, res, next) {
     return res.status(401).send('Unauthorized');
 }
 
-app.get('/personaluser', isAuthenticated, async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-        res.json({ 
-            firstName: user.firstName, 
-            favorites: user.favorites || [] 
-        });
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-        res.status(500).send('Error fetching user data');
-    }
+// Serve HTML pages
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/OriginalWebPage.html');
 });
-//direct from search box to chattanooga page
+
+app.get('/signup', (req, res) => {
+    res.sendFile(__dirname + '/public/signup.html');
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+});
+
 app.get('/chattanooga', (req, res) => {
     res.sendFile(__dirname + '/public/chattanooga.html');
 });
 
 app.get('/restaurants', async (req, res) => {
     try {
-        // Fetch all places from the database
-        const places = await Place.find({}).populate('ratings.user');
-        // If you are getting data from Geoapify API, make sure the API data includes 'name', 'address', etc.
-        // If you use Geoapify, make sure to handle Geoapify API responses properly, here's an example:
-        const geoapifyApiKey = '4dee9244ca9041a8a882f81b760bc3ac';
-        const geoapifyUrl = `https://api.geoapify.com/v2/places?categories=catering.restaurant&limit=20&apiKey=${geoapifyApiKey}`;
-        const geoapifyResponse = await fetch(geoapifyUrl);
-        const geoapifyData = await geoapifyResponse.json();
-
-        // If you're using the Geoapify API data to render restaurants, you'll want to use that data for rendering
-        // We'll merge the data from the database and API before sending it to the frontend
-
-        res.status(200).json(places); // Or send back merged data (API + DB)
+        const places = await Place.find({}).populate('ratings.user');  // Populate ratings with user details
+        res.status(200).json(places); // Send the places with ratings (even if empty)
     } catch (err) {
         console.error('Error fetching places:', err);
         res.status(500).json({ error: 'Error fetching places' });
     }
 });
 
-  
-//API endpoint for user signup
+// API endpoint for user signup
 app.post('/signup', async (req, res) => {
     const { username, firstName, lastName, email, password } = req.body;
-    //const hashedPassword = await bcrypt.hash(password, 10);
-
     try {
-        //check if the user already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(400).send('User already exists');
         }
-        //const newUser = new User({ username, email, password: hashedPassword });
         const newUser = new User({ username, firstName, lastName, email, password });
-        await newUser.save(); //save user to the database!
+        await newUser.save(); // Save user to the database
         res.status(201).send('User created successfully');
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).send('Error creating user');
     }
 });
-//login redirect checks if it works or not
+
+// Login endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
     try {
-        // Log the User model to see if it's available
-        console.log('User model:', User); // Debugging line
-
         const user = await User.findOne({ username });
         if (!user || password !== user.password) {
             return res.status(400).send('Invalid username or password');
         }
-
-        // Set user in session
         req.login(user, (err) => {
             if (err) return res.status(500).send('Login error');
             return res.status(200).send('Login successful');
@@ -170,151 +121,140 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Rating submission route (Check if user has already rated and update or create a new rating)
+// Assuming you are using fetch to interact with the Geoapify API or another API
+const fetch = require('node-fetch');
 
+// Your API Key for Geoapify or other external API
+REDACTED_API_KEY
 
+// Function to fetch data from the external API
+async function fetchPlaceDataFromAPI(placeId) {
+    try {
+        const response = await fetch(`https://api.geoapify.com/v2/places/${placeId}?apiKey=${API_KEY}`);
+        const data = await response.json();
 
-// Middleware for authentication
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
+        if (data && data.features && data.features.length > 0) {
+            const placeData = data.features[0].properties;
+
+            // Extract relevant data
+            const name = placeData.name || "Unknown Name";
+            const address = placeData.address_line1 || "Unknown Address";
+            const city = placeData.city || "Unknown City";
+            const phone = placeData.phone || "Unknown Phone";
+            const website = placeData.website || "Unknown Website";
+
+            return {
+                name,
+                address,
+                city,
+                phone,
+                website
+            };
+        } else {
+            throw new Error("Place data not found in API response");
+        }
+    } catch (error) {
+        console.error("Error fetching place data from API:", error);
+        return {
+            name: "Unknown Place",
+            address: "Unknown Address",
+            city: "Unknown City",
+            phone: "Unknown Phone",
+            website: "Unknown Website"
+        };
     }
-    return res.status(401).send('Unauthorized');
 }
 
-
-app.get('/places/:category', async (req, res) => {
-    const { category } = req.params;
-    try {
-        const places = await Place.find({ category: category })
-            .populate('ratings.user', 'username') // Get the username of the user who rated
-            .populate('comments.user', 'username'); // Get the username of the user who commented
-
-        res.json(places);
-    } catch (error) {
-        console.error('Error fetching places:', error);
-        res.status(500).send('Error fetching places');
-    }
-});
-
-
-// POST request to submit rating
-app.post('/rate/:placeId', async (req, res) => {
+// Rating submission route (with real data fetched from API)
+app.post('/rate/:placeId', isAuthenticated, async (req, res) => {
     const { placeId } = req.params;
     const { rating } = req.body;
-  
-    try {
-      const place = await Place.findOne({ placeId }).populate('ratings.user');  // Populate user in ratings
-  
-      if (!place) {
-        return res.status(404).json({ error: 'Place not found' });
-      }
-  
-      // Check if user has already rated, and update or add a new rating
-      const existingRating = place.ratings.find(r => r.user.toString() === req.user._id.toString());
-      if (existingRating) {
-        existingRating.rating = rating;  // Update existing rating
-      } else {
-        place.ratings.push({ user: req.user._id, rating });  // Add new rating
-      }
-  
-      await place.save();
-      
-      // Send back the updated place with ratings
-      const updatedPlace = await Place.findOne({ placeId }).populate('ratings.user');
-      res.status(200).json(updatedPlace);  // Return the updated place document
-    } catch (err) {
-      console.error('Error posting rating:', err);
-      res.status(500).json({ error: 'Error posting rating' });
-    }
-  });
-  
-  
-
-// API endpoint for submitting a comment -summer
-app.post('/comment/:placeId', async (req, res) => {
-    const { placeId } = req.params;  //extract placeId from the URL
-    const { comment } = req.body;    //get comment text from the request body
-
-    //assuming the user is authenticated and we have the userId
-    const userId = req.user._id;
-
-    //validate inputs
-    if (!placeId || !comment || !userId) {
-        return res.status(400).json({ error: 'Place ID, comment, and user ID are required' });
-    }
+    const user = req.user;  // The authenticated user
 
     try {
-        //check if place already exists in the database by placeId (is in )
+        // Check if the place already exists in the database
         let place = await Place.findOne({ placeId });
 
         if (!place) {
-            console.log(`Place with placeId ${placeId} not found, creating a new place.`);
-            
-            //fetch place details from Geoapify API (optional)
-            const geoapifyApiKey = '4dee9244ca9041a8a882f81b760bc3ac';
-            const geoapifyUrl = `https://api.geoapify.com/v2/places/${placeId}?apiKey=${geoapifyApiKey}`;
-            
-            const response = await fetch(geoapifyUrl);
-            const data = await response.json();
+            // If the place does not exist, fetch real data from the API
+            const placeData = await fetchPlaceDataFromAPI(placeId);
 
-            if (!data.features || data.features.length === 0) {
-                return res.status(404).json({ error: 'Place not found in Geoapify' });
-            }
-
-            //extract place details from Geoapify API response with safe checks
-            const placeData = data.features[0]?.properties || {};
-
-            const name = placeData.name || 'Unknown Place';
-            const address = placeData.address_line1 || 'Unknown Address';
-            const category = placeData.categories?.[0] || 'Unknown Category';
-
-            //create a new place document if it doesn't exist in database yet
+            // Create a new place document with the fetched data
             place = new Place({
-                placeId,                          // Use Geoapify's placeId
-                name,                             // Get name from Geoapify
-                address,                          // Get address from Geoapify
-                category,                         // Get category from Geoapify
-                ratings: [],
-                comments: []
+                placeId,
+                name: placeData.name,
+                address: placeData.address,
+                city: placeData.city,
+                phone: placeData.phone,
+                website: placeData.website,
+                ratings: [],  // Initialize as empty array for ratings
+                comments: []  // Initialize as empty array for comments
             });
 
-            //save the new place to the database
             await place.save();
-            console.log(`New place created with placeId ${placeId}`);
+            console.log(`Created new place with ID: ${placeId} and fetched data.`);
         }
 
-        // Add the new comment to the place's comments array
-        place.comments.push({
-            user: userId,            // Store the user's ID
-            text: comment,           // Store the comment text
-            createdAt: new Date()    // Automatically set the creation date
-        });
+        // Check if the user has already rated this place
+        const existingRating = place.ratings.find(r => r.user.toString() === user._id.toString());
 
-        //save the updated place with the new comment
+        if (existingRating) {
+            // If user has rated, update their rating
+            existingRating.rating = rating;
+            await place.save();
+            return res.status(200).send('Rating updated');
+        } else {
+            // If the user has not rated this place yet, create a new rating
+            place.ratings.push({ user: user._id, rating });
+            await place.save();
+            return res.status(201).send('Rating added');
+        }
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        return res.status(500).send('Error submitting rating');
+    }
+});
+
+
+// Comment submission route
+app.post('/comment/:placeId', isAuthenticated, async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
+    const user = req.user;  // The authenticated user
+
+    try {
+        // Check if the place already exists in the database
+        let place = await Place.findOne({ placeId });
+
+        if (!place) {
+            // If the place does not exist, create it with initialized fields
+            place = new Place({
+                placeId,
+                name: "Unknown Place",  // Placeholder name
+                address: "Unknown Address",  // Placeholder address
+                city: "Unknown City",  // Placeholder city
+                phone: "Unknown Phone",  // Placeholder phone
+                website: "Unknown Website",  // Placeholder website
+                ratings: [],  // Initialize as empty array for ratings
+                comments: []  // Initialize as empty array for comments
+            });
+            await place.save();
+            console.log(`Created new place with ID: ${placeId}`);
+        }
+
+        // Add the comment to the place
+        place.comments.push({ text, user: user._id });
         await place.save();
 
-        res.status(200).json({ message: 'Comment posted successfully!' });
+        return res.status(201).send('Comment added');
     } catch (error) {
-        console.error('Error posting comment:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error adding comment:', error);
+        return res.status(500).send('Error adding comment');
     }
 });
 
-
-
-
-//can delete ltr debugging
-app.get('/test', async (req, res) => {
-    try {
-        const user = await User.findOne({ username: 'testuser' });
-        res.json(user); //should return user data if found
-    } catch (error) {
-        res.status(500).send('Error accessing database');
-    }
-});
-
-
-//start the server!
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
