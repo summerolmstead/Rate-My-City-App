@@ -76,15 +76,37 @@ app.get('/chattanooga', (req, res) => {
     res.sendFile(__dirname + '/public/chattanooga.html');
 });
 
+// API endpoint for getting places (including places with no ratings)
 app.get('/restaurants', async (req, res) => {
     try {
+        // Fetch all places from the database
         const places = await Place.find({}).populate('ratings.user');  // Populate ratings with user details
-        res.status(200).json(places); // Send the places with ratings (even if empty)
+
+        // Iterate over the places and check if their names are "Unknown Place"
+        for (let place of places) {
+            if (place.name === "Unknown Place") {
+                // If the place has no real data, fetch it from the API
+                const placeData = await fetchPlaceDataFromAPI(place.placeId);
+                
+                // Update the place with real data
+                place.name = placeData.name;
+                place.address = placeData.address;
+                place.city = placeData.city;
+                place.phone = placeData.phone;
+                place.website = placeData.website;
+                
+                // Save the updated place to the database
+                await place.save();
+            }
+        }
+
+        res.status(200).json(places); // Send all places, even those with no ratings yet
     } catch (err) {
         console.error('Error fetching places:', err);
         res.status(500).json({ error: 'Error fetching places' });
     }
 });
+
 
 // API endpoint for user signup
 app.post('/signup', async (req, res) => {
@@ -258,4 +280,3 @@ app.post('/comment/:placeId', isAuthenticated, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-
