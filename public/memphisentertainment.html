@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment in Chattanooga</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="memphisstyles.css">
 </head>
 <style>
     /* Style for the genre buttons as tabs */
@@ -119,21 +119,21 @@
 </style>
 <body>
     <header>
-        <h1>Entertainment in Chattanooga</h1>
+        <h1>Entertainment in Memphis</h1>
         <nav>
             <ul>
                 <li><a href="OriginalWebPage.html">Main Menu</a></li>
-                <li><a href="chattanooga.html">Home</a></li>
-                <li><a href="restaurants.html">Restaurants</a></li>
-                <li><a href="hotels.html">Hotels</a></li>
-                <li><a href="entertainment.html">Entertainment</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
+                <li><a href="memphis.html">Home</a></li>
+                <li><a href="memphisrestaurants.html">Restaurants</a></li>
+                <li><a href="memphishotels.html">Hotels</a></li>
+                <li><a href="memphisentertainment.html">Entertainment</a></li>
+                <li><a href="memphishealthcare.html">Healthcare</a></li>
             </ul>
         </nav>
     </header>
 
     <main id="entertainment-main">
-        <h2>Explore Entertainment in Chattanooga</h2>
+        <h2>Explore Entertainment in Memphis</h2>
 
         <!-- Genre buttons (for each entertainment category) -->
         <div id="genre-buttons">
@@ -161,7 +161,7 @@
             placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
     
             try {
-                const response = await fetch(`/entertainment/${category}`);
+                const response = await fetch(`/memphisentertainment/${category}`);
                 const places = await response.json();
     
                 placeList.innerHTML = '';  // Clear loading message

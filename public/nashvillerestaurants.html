@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurants in Memphis</title>
-    <link rel="stylesheet" href="memphisstyles.css">
+    <title>Restaurants in Nashville</title>
+    <link rel="stylesheet" href="nashvillestyle.css">
 </head>
 <style>
     /* Container for the stars */
@@ -49,15 +49,15 @@
 </style>
 <body>
     <header>
-        <h1>Restaurants in Memphis</h1>
+        <h1>Restaurants in Nashville</h1>
         <nav>
             <ul>
                 <li><a href="OriginalWebPage.html">Main Menu</a></li>
-                <li><a href="memphis.html">Home</a></li>
-                <li><a href="memphisrestaurants.html">Restaurants</a></li>
-                <li><a href="memphishotels.html">Hotels</a></li>
-                <li><a href="memphisentertainment.html">Entertainment</a></li>
-                <li><a href="memphishealthcare.html">Healthcare</a></li>
+                <li><a href="nashville.html">Home</a></li>
+                <li><a href="nashvillerestaurants.html">Restaurants</a></li>
+                <li><a href="nashvillehotels.html">Hotels</a></li>
+                <li><a href="nashvilleentertainment.html">Entertainment</a></li>
+                <li><a href="nashvillehealthcare.html">Healthcare</a></li>
             </ul>
         </nav>
     </header>
@@ -72,7 +72,7 @@
         // Function to fetch restaurants from the server
         async function loadRestaurants() {
             try {
-                const response = await fetch('/memphisrestaurants');
+                const response = await fetch('/nashvillerestaurants');
                 const places = await response.json();
     
                 placeList.innerHTML = '';  // Clear the loading message

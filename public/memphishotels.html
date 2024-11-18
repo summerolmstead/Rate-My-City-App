@@ -3,85 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare in Chattanooga</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Hotels in Memphis</title>
+    <link rel="stylesheet" href="memphisstyles.css">
     <style>
-        /* Style for the category buttons as tabs */
-        #category-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .category-button {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .category-button:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .category-button.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        /* Style for the place item (healthcare facility) */
-        .place-item {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 10px 0;
-            background-color: #f9f9f9;
-        }
-
-        .place-item h4 {
-            font-size: 1.5rem;
-            margin: 0;
-        }
-
-        .place-item p {
-            margin: 0.5rem 0;
-        }
-
-        .place-item textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        /* Submit buttons for comment and rating */
-        .place-item form button {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            color: black;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .place-item form button:hover {
-            background-color: #007bff;
-            color: white;
-        }
-
         /* Container for the stars */
         .stars {
             display: flex;
             direction: row;
-            font-size: 0;
+            font-size: 0;  /* Remove the space between the stars */
         }
 
         /* The base star shape (empty star) */
@@ -91,7 +20,7 @@
             background-color: transparent;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             background-color: #e0e0e0; /* Empty star (light gray) */
-            margin: 0 2px;
+            margin: 0 2px; /* Add space between stars */
             position: relative;
         }
 
@@ -119,58 +48,33 @@
 </head>
 <body>
     <header>
-        <h1>Healthcare in Chattanooga</h1>
+        <h1>Hotels in Memphis</h1>
         <nav>
             <ul>
                 <li><a href="OriginalWebPage.html">Main Menu</a></li>
-                <li><a href="chattanooga.html">Home</a></li>
-                <li><a href="restaurants.html">Restaurants</a></li>
-                <li><a href="hotels.html">Hotels</a></li>
-                <li><a href="entertainment.html">Entertainment</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
+                <li><a href="memphis.html">Home</a></li>
+                <li><a href="memphisrestaurants.html">Restaurants</a></li>
+                <li><a href="memphishotels.html">Hotels</a></li>
+                <li><a href="memphisentertainment.html">Entertainment</a></li>
+                <li><a href="memphishealthcare.html">Healthcare</a></li>
             </ul>
         </nav>
     </header>
 
-    <main id="healthcare-main">
-        <h2>Explore Healthcare in Chattanooga</h2>
-
-        <!-- Category buttons for 'Clinics' and 'Hospitals' -->
-        <div id="category-buttons">
-            <button class="category-button" onclick="loadHealthcare('healthcare.clinic_or_praxis')">Clinics</button>
-            <button class="category-button" onclick="loadHealthcare('healthcare.hospital')">Hospitals</button>
-        </div>
-
-        <div id="place-list">
-            <h3>Loading healthcare places...</h3>
-        </div>
+    <main id="place-list">
+        <h2>Loading Hotels...</h2>
     </main>
 
     <script>
         const placeList = document.getElementById('place-list');
     
-        // Add a flag to track if the request is currently in progress
-        let isLoading = false;
-    
-        async function loadHealthcare(category) {
-            if (isLoading) return;  // Prevent duplicate requests while one is still loading
-            isLoading = true;  // Set loading flag to true
-    
-            placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
-    
+        // Function to fetch hotels from the server
+        async function loadHotels() {
             try {
-                console.log('Fetching healthcare for category:', category);  // Log the category before making the request
-                const response = await fetch(`/healthcare/${category}`);
-                console.log('Response status:', response.status);  // Log the status of the response
-
-                if (!response.ok) {
-                    throw new Error(`Failed to load healthcare places: ${response.status}`);
-                }
-    
+                const response = await fetch('/memphishotels');  // Fetch hotels data from the backend
                 const places = await response.json();
-                console.log('Fetched healthcare places:', places);  // Log the fetched data
     
-                placeList.innerHTML = '';  // Clear loading message
+                placeList.innerHTML = '';  // Clear the loading message
     
                 if (places.length > 0) {
                     places.forEach((place) => {
@@ -184,19 +88,19 @@
                         const ratingCount = ratings.length;
                         const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
     
-                        // Create HTML element for each place
+                        // Create HTML element for each hotel
                         const item = document.createElement('div');
                         item.classList.add('place-item');
                         item.innerHTML = `
-                            <h4>${name}</h4>
+                            <h3>${name}</h3>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
                             <p><strong>City:</strong> ${city}</p>
                             <p><strong>Phone:</strong> ${phone}</p>
                             <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
                             <div>
                                 <strong>Rating: </strong>
-                                <div class="stars">${renderStars(averageRating)}</div>
-                                <span>(${ratingCount} ratings)</span>
+                                <div id="rating-${placeId}" class="stars">${renderStars(averageRating)}</div>
+                                <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
                             </div>
     
                             <h4>Comments:</h4>
@@ -226,12 +130,26 @@
                             });
                         }
     
-                        // Event listeners for rating and comment forms
+                        // Event listener for the rating form
                         document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
-                            const rating = event.target.rating.value;
+                            console.log("Submit button clicked!");  // Debugging log
     
-                            const response = await fetch(`/rate/chattanooga/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
+                            const ratingInput = event.target.rating;
+                            if (!ratingInput) {
+                                console.error("Rating input not found!");
+                                return;
+                            }
+    
+                            const rating = parseInt(ratingInput.value);
+                            console.log("Rating submitted:", { rating });  // Log the values to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            const response = await fetch(`/rate/${place.city.toLowerCase()}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -239,14 +157,18 @@
                                 body: JSON.stringify({ rating })
                             });
     
+                            console.log('Response status:', response.status);  // Log response status for debugging
+                            console.log('Response text:', await response.text());  // Log the response text
+    
                             if (response.ok) {
                                 alert('Rating submitted successfully!');
-                                loadHealthcare(category);  // Reload the places to show updated ratings
+                                loadHotels();  // Reload the hotels to show updated ratings
                             } else {
                                 alert('Error submitting rating');
                             }
                         });
     
+                        // Event listener for the comment form
                         document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
                             const comment = event.target.comment.value;
@@ -254,7 +176,7 @@
                             const city = place.city.toLowerCase();  // Dynamically get the city
                             console.log("City for comment:", city);  // Log to ensure city is correct
     
-                            const response = await fetch(`/comment/chattanooga/${placeId}`, {  // Update the route to include 'chattanooga'
+                            const response = await fetch(`/comment/${city}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -264,20 +186,19 @@
     
                             if (response.ok) {
                                 alert('Comment posted successfully!');
-                                loadHealthcare(category); // Reload the places to show updated comments
+                                loadHotels();  // Reload the places to show updated comments
                             } else {
                                 alert('Error posting comment');
                             }
                         });
-                    });
+    
+                    });  // Closing forEach
                 } else {
-                    placeList.innerHTML = '<p>No healthcare places found for this category.</p>';
+                    placeList.innerHTML = '<p>No hotels found.</p>';
                 }
             } catch (error) {
-                console.error('Error fetching healthcare places:', error);
-                placeList.innerHTML = '<p>Error loading healthcare places.</p>';
-            } finally {
-                isLoading = false;  // Reset loading flag after the fetch operation is complete
+                console.error('Error fetching hotel data:', error);
+                placeList.innerHTML = '<p>Error loading hotels.</p>';
             }
         }
     
@@ -301,11 +222,10 @@
             return stars.join('');
         }
     
-        // Initial load (optional, could be a default category)
-        loadHealthcare('healthcare.clinic_or_praxis');
+        loadHotels();  // Initial call to load hotels
     </script>
     
-    
 </body>
-
 </html>
+
+

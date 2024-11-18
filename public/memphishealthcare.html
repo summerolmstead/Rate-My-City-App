@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare in Chattanooga</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Healthcare in Memphis</title>
+    <link rel="stylesheet" href="memphisstyles.css">
     <style>
         /* Style for the category buttons as tabs */
         #category-buttons {
@@ -119,21 +119,21 @@
 </head>
 <body>
     <header>
-        <h1>Healthcare in Chattanooga</h1>
+        <h1>Healthcare in Memphis</h1>
         <nav>
             <ul>
                 <li><a href="OriginalWebPage.html">Main Menu</a></li>
-                <li><a href="chattanooga.html">Home</a></li>
-                <li><a href="restaurants.html">Restaurants</a></li>
-                <li><a href="hotels.html">Hotels</a></li>
-                <li><a href="entertainment.html">Entertainment</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
+                <li><a href="memphis.html">Home</a></li>
+                <li><a href="memphisrestaurants.html">Restaurants</a></li>
+                <li><a href="memphishotels.html">Hotels</a></li>
+                <li><a href="memphisentertainment.html">Entertainment</a></li>
+                <li><a href="memphishealthcare.html">Healthcare</a></li>
             </ul>
         </nav>
     </header>
 
     <main id="healthcare-main">
-        <h2>Explore Healthcare in Chattanooga</h2>
+        <h2>Explore Healthcare in Memphis</h2>
 
         <!-- Category buttons for 'Clinics' and 'Hospitals' -->
         <div id="category-buttons">
@@ -146,13 +146,16 @@
         </div>
     </main>
 
+    
     <script>
         const placeList = document.getElementById('place-list');
-    
+
         // Add a flag to track if the request is currently in progress
         let isLoading = false;
+
     
-        async function loadHealthcare(category) {
+        async function loadHealthcare() {
+
             if (isLoading) return;  // Prevent duplicate requests while one is still loading
             isLoading = true;  // Set loading flag to true
     
@@ -160,9 +163,9 @@
     
             try {
                 console.log('Fetching healthcare for category:', category);  // Log the category before making the request
-                const response = await fetch(`/healthcare/${category}`);
+                const response = await fetch(`/memphishealthcare/${category}`);
                 console.log('Response status:', response.status);  // Log the status of the response
-
+    
                 if (!response.ok) {
                     throw new Error(`Failed to load healthcare places: ${response.status}`);
                 }
@@ -231,7 +234,7 @@
                             event.preventDefault();
                             const rating = event.target.rating.value;
     
-                            const response = await fetch(`/rate/chattanooga/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
+                            const response = await fetch(`/rate/memphis/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -254,7 +257,7 @@
                             const city = place.city.toLowerCase();  // Dynamically get the city
                             console.log("City for comment:", city);  // Log to ensure city is correct
     
-                            const response = await fetch(`/comment/chattanooga/${placeId}`, {  // Update the route to include 'chattanooga'
+                            const response = await fetch(`/comment/memphis/${placeId}`, {  // Update the route to include 'chattanooga'
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

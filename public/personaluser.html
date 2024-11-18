@@ -145,6 +145,8 @@
                 <datalist id="cities">
                     <option value="Chattanooga">
                     <option value="Memphis">
+                    <option value="Knoxville">
+                    <option value="Nashville">
 
                     </option>
                 </datalist>
@@ -166,18 +168,25 @@
     function searchCity() 
     {
         var cityInput = document.getElementById('cityInput').value;
-        if (cityInput.toLowerCase() === 'chattanooga') 
-        {
-            window.location.href = 'chattanooga.html';
-        } 
-        else if(cityInput.toLowerCase() === 'memphis') // need to add memphis!!
-        {
-            window.location.href = 'memphis.html';
-        }
-        else 
-        {
-            alert('Choose or type a city.');
-        }
+        if (cityInput.toLowerCase() === 'chattanooga') {
+                window.location.href = 'chattanooga.html';
+            } 
+            else if(cityInput.toLowerCase() === 'memphis')
+            {
+                window.location.href = "memphis.html"; //summer adding memphis to test if works w/ general logic
+            }
+            else if(cityInput.toLowerCase() === 'knoxville')
+            {
+                window.location.href = "knoxville.html"; //adding knoxville
+            }
+            else if(cityInput.toLowerCase() === 'nashville')
+            {
+                window.location.href = "nashville.html"; //adding knoxville
+            }
+            else 
+            {
+                alert('Choose or type a city.');
+            }
     }
    document.addEventListener('DOMContentLoaded', async () => {
     // Clear the firstName from localStorage if you just logged in or after signup
