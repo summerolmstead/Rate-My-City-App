@@ -12,6 +12,7 @@ const fetch = require('node-fetch');  // This works fine with v2.x must install 
 //import the already defined models in /models where all db tables defined
 const Place = require('./models/Place');  // Already defined in models/Place.js
 const User = require('./models/User');    // Already defined in models/User.js
+const MemphisPlace = require('./models/MemphisPlace');
 
 const app = express();
 const PORT = process.env.PORT || 3307;
@@ -75,6 +76,12 @@ app.get('/chattanooga', (req, res) => {
     res.sendFile(__dirname + '/public/chattanooga.html');
 });
 
+//redirect to city of memphis!!! testing - summer
+app.get('/memphis', (req, res) => {
+    res.sendFile(__dirname + '/public/memphis.html');
+});
+
+//for OG chattanooga as it was the demo originally 
 app.get('/restaurants', async (req, res) => {
     try {
       
@@ -90,6 +97,23 @@ app.get('/restaurants', async (req, res) => {
       res.status(500).json({ message: 'Error fetching restaurants.' });
     }
   });
+
+  app.get('/memphisrestaurants', async (req, res) => {
+    try {
+        // Use the correct model name (MemphisPlace, not MemphisPlacePlace)
+        const restaurants = await MemphisPlace.find({ category: 'catering.restaurant' }).populate('comments'); // Populating comments if necessary
+
+        if (restaurants.length > 0) {
+            res.json(restaurants);
+        } else {
+            res.status(404).json({ message: 'No restaurants found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching restaurants:', error);
+        res.status(500).json({ message: 'Error fetching restaurants.' });
+    }
+});
+
 
   app.get('/hotels', async (req, res) => {
     try {
@@ -180,6 +204,7 @@ app.get('/healthcare/:category', async (req, res) => {
 
 REDACTED_API_KEY  // Your Geoapify API key
 
+//assumed for chattanooga still
 //WHEN WE PASS A CATEGORY FROM THE API IN THIS only call it once!!!!!!!!! if do other cities mak sure to change
 async function fetchAndStorePlacesForCategory(category) {
     try {
@@ -246,6 +271,75 @@ async function fetchAndStorePlacesForCategory(category) {
     }
 }
 
+//summer making test new fetchandstore function specifically for memphis by changing table and longitutde and latitude
+//WHEN WE PASS A CATEGORY FROM THE API IN THIS only call it once!!!!!!!!! if do other cities mak sure to change
+// Function to fetch and store places for a specific category (e.g., Memphis restaurants, etc.)
+// This version is tailored to the Memphis city and uses the MemphisPlace schema
+async function fetchAndStorePlacesForCategoryMemphis(category) {
+    try {
+        console.log(`Fetching places for category: ${category}`); // log the start of fetching
+        
+        // Memphis latitude and longitude
+        const lat = 35.1454;  // Latitude for Memphis
+        const lon = -90.0521; // Longitude for Memphis - GET THIS FROM THE API !!!! when in playground 
+
+        // Construct API request URL for Geoapify Places API with specific category like 'catering.restaurant.pizza'
+        const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
+        console.log(`Requesting API URL: ${apiUrl}`); // log the URL being requested
+
+        // Fetch the data from the Geoapify API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Log raw API response for debugging
+        console.log('Raw API Response:', data);
+
+        // Check if valid data is returned
+        if (!data || !data.features || data.features.length === 0) {
+            console.log(`No places found for category: ${category}`);
+            return;
+        }
+
+        // Loop through the fetched places and save them to MongoDB
+        for (let placeData of data.features) {
+            const place = placeData.properties;
+
+            // Log each place being processed
+            console.log(`Processing place: ${place.name || 'Unnamed Place'}, ID: ${place.place_id}`);
+
+            // Check if the place already exists in the database by placeId
+            const existingPlace = await MemphisPlace.findOne({ placeId: place.place_id });
+
+            // Log if the place already exists or needs to be created
+            if (existingPlace) {
+                console.log(`Place already exists in the database: ${place.name}`);
+            } else {
+                console.log(`Creating new place: ${place.name || 'Unnamed Place'}`);
+
+                // If the place doesn't exist, create a new place document and save it
+                const newPlace = new MemphisPlace({
+                    placeId: place.place_id,
+                    name: place.name || "Unknown Name",
+                    address: place.address_line1 || "Unknown Address",
+                    city: 'Memphis',  // Set city to 'Memphis' explicitly
+                    phone: place.phone || "Unknown Phone",
+                    website: place.website || "Unknown Website",
+                    category: category,  // Store the category for clarity (e.g., restaurant, hotel, etc.)
+                    ratings: [],  // Initialize with empty ratings array
+                    comments: []  // Initialize with empty comments array
+                });
+
+                // Save the new place to the database
+                await newPlace.save();
+                console.log(`Created and saved new place: ${place.name}`);  // For debugging
+            }
+        }
+
+        console.log(`Successfully fetched and stored places for category: ${category}`);
+    } catch (error) {
+        console.error('Error fetching and storing places:', error);
+    }
+}
 
 
 // Call this function once to populate your database with restaurant data
@@ -264,6 +358,10 @@ async function fetchAndStorePlacesForCategory(category) {
 //for healthcare html categories:  STATEMENTS ARE SUCCESS FOR HEALTHCARE -summer
 //fetchAndStorePlacesForCategory('healthcare.clinic_or_praxis');
 //fetchAndStorePlacesForCategory('healthcare.hospital');
+
+
+//testing memphis restaurants summer !!!!! only run once remember ->
+//fetchAndStorePlacesForCategoryMemphis('catering.restaurant'); SUCCESS DO NOT CALL AGAIN LOL
 
 
 
