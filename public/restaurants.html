@@ -121,6 +121,16 @@
                 `;
                 placeList.appendChild(item);
 
+                // Render existing comments if any
+                const commentsList = document.getElementById(`comments-list-${placeId}`);
+                if (place.comments && place.comments.length > 0) {
+                    place.comments.forEach(comment => {
+                        const commentItem = document.createElement('li');
+                        commentItem.textContent = comment.text || 'No comment text available';
+                        commentsList.appendChild(commentItem);
+                    });
+                }
+
                 // Event listeners for rating and comment forms
                 document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
                     event.preventDefault();
@@ -170,6 +180,7 @@
         placeList.innerHTML = '<p>Error loading restaurants.</p>';
     }
 }
+
 
 
         // Function to render stars with full, half, and empty stars using CSS classes

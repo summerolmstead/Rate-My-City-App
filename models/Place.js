@@ -17,7 +17,8 @@ const PlaceSchema = new mongoose.Schema({
     comments: [
         {
             user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-            text: String
+            text: String,
+            createdAt: { type: Date, default: Date.now }
         }
     ],
     category: String  // Add the category field here to store the category (e.g., "restaurant", "hotel")
