@@ -79,7 +79,7 @@ app.get('/chattanooga', (req, res) => {
 app.get('/restaurants', async (req, res) => {
     try {
       // Fetch places where category is 'catering.restaurant'
-      const restaurants = await Place.find({ category: 'catering.restaurant' });
+      const restaurants = await Place.find({ category: 'catering.restaurant' }).populate('comments'); // You can also populate if comments are stored as references in another model
   
       if (restaurants.length > 0) {
         res.json(restaurants);
@@ -275,6 +275,7 @@ app.post('/rate/:placeId', async (req, res) => {
         res.status(500).json({ message: 'Error submitting rating' });
     }
 });
+
 app.post('/comment/:placeId', async (req, res) => {
     const { placeId } = req.params;
     const { text } = req.body;
@@ -286,13 +287,14 @@ app.post('/comment/:placeId', async (req, res) => {
             return res.status(404).json({ message: 'Place not found' });
         }
 
-        place.comments.push({ text });  // Add the new comment
+        place.comments.push({ text });  // Add the new comment to the comments array
         await place.save();
         res.status(200).json({ message: 'Comment submitted successfully!' });
     } catch (error) {
         res.status(500).json({ message: 'Error submitting comment' });
     }
 });
+
 
 
 // Start the server
