@@ -822,7 +822,7 @@ async function fetchAndStorePlacesForCategory(category) {
 
 
 
-//Nashville
+//Nashville - this is still left - RUN THIS FROM NODE SERVER>JS in TERMINAL
 //fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); // Run this to populate nashville hotels - Nandni
 //fetchAndStorePlacesForCategoryNashville('catering.restaurant');  // Fetch and store nashville restaurants - nandni
 //fetchAndStorePlacesForCategoryNashville('healthcare.clinic_or_praxis');

@@ -4,7 +4,7 @@ const KnoxvillePlaceSchema = new mongoose.Schema({
     placeId: String,
     name: String,
     address: String,
-    city: { type: String, default: 'Knoxville' },  // Default city set to Knoxville
+    city: String,
     phone: String,
     website: String,
     ratings: [
