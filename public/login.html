@@ -91,25 +91,34 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password })
-            });
-            // redirects only if gets the correct alert notified
-            if (response.ok) {
-                alert('Login successful');
-                window.location.href = 'personaluser.html'; // redirect to personal user page
-            } else {
-                alert('Invalid username or password. Please try again.'); // scenario doesnt work
+            // Basic client-side validation
+            if (!username || !password) {
+                alert('Please fill out both fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    alert('Login successful!');
+                    window.location.href = 'dashboard.html'; // Redirect to the user dashboard
+                } else {
+                    const errorMessage = await response.text();
+                    alert(errorMessage || 'Error logging in. Please try again.');
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again later.');
+                console.error('Login error:', error);
             }
         });
-        // go home function
-        function homePage() {
-            window.location.href = 'OriginalWebPage.html';
-        }
     </script>
 </body>
 </html>
+
