@@ -158,17 +158,17 @@
 
     <script>
         const placeList = document.getElementById('place-list');
-
+    
         // Function to load entertainment places based on category
         async function loadEntertainment(category) {
             placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
-
+    
             try {
                 const response = await fetch(`/entertainment/${category}`);
                 const places = await response.json();
-
+    
                 placeList.innerHTML = '';  // Clear loading message
-
+    
                 if (places.length > 0) {
                     places.forEach((place) => {
                         const name = place.name || 'Name not available';
@@ -180,7 +180,7 @@
                         const ratings = place.ratings || [];
                         const ratingCount = ratings.length;
                         const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
-
+    
                         // Create HTML element for each place
                         const item = document.createElement('div');
                         item.classList.add('place-item');
@@ -192,27 +192,27 @@
                             <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
                             <div>
                                 <strong>Rating: </strong>
-                                <div class="stars">${renderStars(averageRating)}</div>
-                                <span>(${ratingCount} ratings)</span>
+                                <div class="stars" id="rating-${placeId}">${renderStars(averageRating)}</div>
+                                <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
                             </div>
-
+    
                             <h4>Comments:</h4>
                             <ul id="comments-list-${placeId}">
                                 <!-- Comments will go here -->
                             </ul>
-
+    
                             <form id="rating-form-${placeId}">
                                 <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
                                 <button type="submit">Submit Rating</button>
                             </form>
-
+    
                             <form id="comment-form-${placeId}">
                                 <textarea name="comment" placeholder="Your comment here..." required></textarea>
                                 <button type="submit">Submit Comment</button>
                             </form>
                         `;
                         placeList.appendChild(item);
-
+    
                         // Render existing comments if any
                         const commentsList = document.getElementById(`comments-list-${placeId}`);
                         if (place.comments && place.comments.length > 0) {
@@ -222,40 +222,57 @@
                                 commentsList.appendChild(commentItem);
                             });
                         }
-
+    
                         // Event listeners for rating and comment forms
                         document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
+                            console.log("Submit button clicked!");  // Check if the listener is firing
                             event.preventDefault();
-                            const rating = event.target.rating.value;
-
-                            const response = await fetch(`/rate/${placeId}`, {
+    
+                            const rating = parseInt(event.target.rating.value);  // Get the rating value
+    
+                            console.log("Rating submitted", { rating });  // Log the rating to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            // Dynamically decide which route to hit based on the city (Chattanooga or Memphis)
+                            const city = place.city.toLowerCase(); // Assuming `place.city` holds the city name like "Chattanooga" or "Memphis"
+    
+                            const response = await fetch(`/rate/${city}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({ rating })
+                                body: JSON.stringify({ rating })  // Send only the rating
                             });
-
+    
                             if (response.ok) {
+                                const data = await response.json();  // Get the updated place data from the response
                                 alert('Rating submitted successfully!');
-                                loadEntertainment(category);  // Reload the places to show updated ratings
+    
+                                // Update the stars based on the new rating
+                                updateStars(data.place);
                             } else {
                                 alert('Error submitting rating');
                             }
                         });
-
+    
                         document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
                             const comment = event.target.comment.value;
-
-                            const response = await fetch(`/comment/${placeId}`, {
+    
+                            const city = place.city.toLowerCase();  // Dynamically decide which route to hit based on the city
+    
+                            const response = await fetch(`/comment/${city}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({ text: comment })
                             });
-
+    
                             if (response.ok) {
                                 alert('Comment posted successfully!');
                                 loadEntertainment(category); // Refresh the place list
@@ -272,29 +289,40 @@
                 placeList.innerHTML = '<p>Error loading entertainment places.</p>';
             }
         }
-
+    
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
             const stars = [];
-
+    
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
+    
             for (let i = 0; i < fullStars; i++) {
                 stars.push('<div class="star full"></div>');
             }
-
+    
             if (halfStar) stars.push('<div class="star half"></div>');
             for (let i = 0; i < emptyStars; i++) {
                 stars.push('<div class="star empty"></div>');
             }
-
+    
             return stars.join('');
         }
-
+    
+        // Function to update the stars UI after rating submission
+        function updateStars(place) {
+            const ratingCount = place.ratings.length;
+            const averageRating = place.ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+            const starsHtml = renderStars(averageRating);
+            document.getElementById(`rating-${place.placeId}`).innerHTML = starsHtml;
+            document.getElementById(`rating-count-${place.placeId}`).textContent = `(${ratingCount} ratings)`;
+        }
+    
         // Initial load (optional, could be a default category)
         loadEntertainment('entertainment.bowling_alley');
     </script>
+    
 </body>
 </html>

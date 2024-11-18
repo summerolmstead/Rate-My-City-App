@@ -460,26 +460,83 @@ app.post('/rate', isAuthenticated, async (req, res) => {
 });
 
 
-app.post('/rate/:placeId', async (req, res) => {
+// Memphis-specific rating submission route
+app.post('/rate/memphis/:placeId', async (req, res) => {
     const { placeId } = req.params;
     const { rating } = req.body;
 
+    console.log("Rating submission for Memphis placeId:", placeId);  // Log to check
+
     try {
+        // Find the place in the Memphis database
+        const place = await MemphisPlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        // Add the rating to the ratings array
+        place.ratings.push({ rating });
+
+        await place.save();
+        res.status(200).json({ message: 'Rating submitted successfully!' });
+
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        res.status(500).json({ message: 'Error submitting rating' });
+    }
+});
+
+// Chattanooga-specific rating submission route
+app.post('/rate/chattanooga/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { rating } = req.body;  // Only the rating is being processed
+
+    console.log("Rating submission for Chattanooga placeId:", placeId);
+
+    try {
+        // Find the place in the Chattanooga database
         const place = await Place.findOne({ placeId });
 
         if (!place) {
             return res.status(404).json({ message: 'Place not found' });
         }
 
-        place.ratings.push({ rating });  // Add the new rating
+        // Add the rating to the ratings array
+        place.ratings.push({ rating });
+
+        // Save the place and send back the updated place data
         await place.save();
-        res.status(200).json({ message: 'Rating submitted successfully!' });
+        res.status(200).json({ message: 'Rating submitted successfully!', place });  // Send the updated place object
+
     } catch (error) {
+        console.error('Error submitting rating:', error);
         res.status(500).json({ message: 'Error submitting rating' });
     }
 });
 
-app.post('/comment/:placeId', async (req, res) => {
+// Memphis comment submission route
+app.post('/comment/memphis/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
+
+    try {
+        const place = await MemphisPlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.comments.push({ text });
+        await place.save();
+        res.status(200).json({ message: 'Comment submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting comment' });
+    }
+});
+
+// Chattanooga comment submission route
+app.post('/comment/chattanooga/:placeId', async (req, res) => {
     const { placeId } = req.params;
     const { text } = req.body;
 
@@ -490,7 +547,7 @@ app.post('/comment/:placeId', async (req, res) => {
             return res.status(404).json({ message: 'Place not found' });
         }
 
-        place.comments.push({ text });  // Add the new comment to the comments array
+        place.comments.push({ text });
         await place.save();
         res.status(200).json({ message: 'Comment submitted successfully!' });
     } catch (error) {

@@ -149,163 +149,166 @@
     <footer>
         <p>&copy; 2024 Chattanooga</p>
     </footer>
-
     <script>
         const placeList = document.getElementById('place-list');
-
+    
         // Add a flag to track if the request is currently in progress
-let isLoading = false;
-
-async function loadHealthcare(category) {
-    if (isLoading) return;  // Prevent duplicate requests while one is still loading
-    isLoading = true;  // Set loading flag to true
-
-    placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
-
-    try {
-        console.log('Fetching healthcare for category:', category);  // Log the category before making the request
-        const response = await fetch(`/healthcare/${category}`);
-        console.log('Response status:', response.status);  // Log the status of the response
-
-        if (!response.ok) {
-            throw new Error(`Failed to load healthcare places: ${response.status}`);
-        }
-
-        const places = await response.json();
-        console.log('Fetched healthcare places:', places);  // Log the fetched data
-
-        placeList.innerHTML = '';  // Clear loading message
-
-        if (places.length > 0) {
-            places.forEach((place) => {
-                const name = place.name || 'Name not available';
-                const streetAddress = place.address || 'Street address not available';
-                const city = place.city || 'City not available';
-                const phone = place.phone || 'Phone number not available';
-                const website = place.website || 'Website not available';
-                const placeId = place.placeId;
-                const ratings = place.ratings || [];
-                const ratingCount = ratings.length;
-                const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
-
-                // Create HTML element for each place
-                const item = document.createElement('div');
-                item.classList.add('place-item');
-                item.innerHTML = `
-                    <h4>${name}</h4>
-                    <p><strong>Street Address:</strong> ${streetAddress}</p>
-                    <p><strong>City:</strong> ${city}</p>
-                    <p><strong>Phone:</strong> ${phone}</p>
-                    <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
-                    <div>
-                        <strong>Rating: </strong>
-                        <div class="stars">${renderStars(averageRating)}</div>
-                        <span>(${ratingCount} ratings)</span>
-                    </div>
-
-                    <h4>Comments:</h4>
-                    <ul id="comments-list-${placeId}">
-                        <!-- Comments will go here -->
-                    </ul>
-
-                    <form id="rating-form-${placeId}">
-                        <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
-                        <button type="submit">Submit Rating</button>
-                    </form>
-
-                    <form id="comment-form-${placeId}">
-                        <textarea name="comment" placeholder="Your comment here..." required></textarea>
-                        <button type="submit">Submit Comment</button>
-                    </form>
-                `;
-                placeList.appendChild(item);
-
-                // Render existing comments if any
-                const commentsList = document.getElementById(`comments-list-${placeId}`);
-                if (place.comments && place.comments.length > 0) {
-                    place.comments.forEach(comment => {
-                        const commentItem = document.createElement('li');
-                        commentItem.textContent = comment.text || 'No comment text available';
-                        commentsList.appendChild(commentItem);
-                    });
+        let isLoading = false;
+    
+        async function loadHealthcare(category) {
+            if (isLoading) return;  // Prevent duplicate requests while one is still loading
+            isLoading = true;  // Set loading flag to true
+    
+            placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
+    
+            try {
+                console.log('Fetching healthcare for category:', category);  // Log the category before making the request
+                const response = await fetch(`/healthcare/${category}`);
+                console.log('Response status:', response.status);  // Log the status of the response
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to load healthcare places: ${response.status}`);
                 }
-
-                // Event listeners for rating and comment forms
-                document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const rating = event.target.rating.value;
-
-                    const response = await fetch(`/rate/${placeId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ rating })
+    
+                const places = await response.json();
+                console.log('Fetched healthcare places:', places);  // Log the fetched data
+    
+                placeList.innerHTML = '';  // Clear loading message
+    
+                if (places.length > 0) {
+                    places.forEach((place) => {
+                        const name = place.name || 'Name not available';
+                        const streetAddress = place.address || 'Street address not available';
+                        const city = place.city || 'City not available';
+                        const phone = place.phone || 'Phone number not available';
+                        const website = place.website || 'Website not available';
+                        const placeId = place.placeId;
+                        const ratings = place.ratings || [];
+                        const ratingCount = ratings.length;
+                        const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+                        // Create HTML element for each place
+                        const item = document.createElement('div');
+                        item.classList.add('place-item');
+                        item.innerHTML = `
+                            <h4>${name}</h4>
+                            <p><strong>Street Address:</strong> ${streetAddress}</p>
+                            <p><strong>City:</strong> ${city}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
+                            <div>
+                                <strong>Rating: </strong>
+                                <div class="stars">${renderStars(averageRating)}</div>
+                                <span>(${ratingCount} ratings)</span>
+                            </div>
+    
+                            <h4>Comments:</h4>
+                            <ul id="comments-list-${placeId}">
+                                <!-- Comments will go here -->
+                            </ul>
+    
+                            <form id="rating-form-${placeId}">
+                                <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
+                                <button type="submit">Submit Rating</button>
+                            </form>
+    
+                            <form id="comment-form-${placeId}">
+                                <textarea name="comment" placeholder="Your comment here..." required></textarea>
+                                <button type="submit">Submit Comment</button>
+                            </form>
+                        `;
+                        placeList.appendChild(item);
+    
+                        // Render existing comments if any
+                        const commentsList = document.getElementById(`comments-list-${placeId}`);
+                        if (place.comments && place.comments.length > 0) {
+                            place.comments.forEach(comment => {
+                                const commentItem = document.createElement('li');
+                                commentItem.textContent = comment.text || 'No comment text available';
+                                commentsList.appendChild(commentItem);
+                            });
+                        }
+    
+                        // Event listeners for rating and comment forms
+                        document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const rating = event.target.rating.value;
+    
+                            const response = await fetch(`/rate/chattanooga/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ rating })
+                            });
+    
+                            if (response.ok) {
+                                alert('Rating submitted successfully!');
+                                loadHealthcare(category);  // Reload the places to show updated ratings
+                            } else {
+                                alert('Error submitting rating');
+                            }
+                        });
+    
+                        document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const comment = event.target.comment.value;
+    
+                            const city = place.city.toLowerCase();  // Dynamically get the city
+                            console.log("City for comment:", city);  // Log to ensure city is correct
+    
+                            const response = await fetch(`/comment/chattanooga/${placeId}`, {  // Update the route to include 'chattanooga'
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ text: comment })
+                            });
+    
+                            if (response.ok) {
+                                alert('Comment posted successfully!');
+                                loadHealthcare(category); // Reload the places to show updated comments
+                            } else {
+                                alert('Error posting comment');
+                            }
+                        });
                     });
-
-                    if (response.ok) {
-                        alert('Rating submitted successfully!');
-                        loadHealthcare(category);  // Reload the places to show updated ratings
-                    } else {
-                        alert('Error submitting rating');
-                    }
-                });
-
-                document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const comment = event.target.comment.value;
-
-                    const response = await fetch(`/comment/${placeId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ text: comment })
-                    });
-
-                    if (response.ok) {
-                        alert('Comment posted successfully!');
-                        loadHealthcare(category); // Refresh the place list
-                    } else {
-                        alert('Error posting comment');
-                    }
-                });
-            });
-        } else {
-            placeList.innerHTML = '<p>No healthcare places found for this category.</p>';
+                } else {
+                    placeList.innerHTML = '<p>No healthcare places found for this category.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching healthcare places:', error);
+                placeList.innerHTML = '<p>Error loading healthcare places.</p>';
+            } finally {
+                isLoading = false;  // Reset loading flag after the fetch operation is complete
+            }
         }
-    } catch (error) {
-        console.error('Error fetching healthcare places:', error);
-        placeList.innerHTML = '<p>Error loading healthcare places.</p>';
-    } finally {
-        isLoading = false;  // Reset loading flag after the fetch operation is complete
-    }
-}
-
-
-
+    
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
             const stars = [];
-
+    
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
+    
             for (let i = 0; i < fullStars; i++) {
                 stars.push('<div class="star full"></div>');
             }
-
+    
             if (halfStar) stars.push('<div class="star half"></div>');
             for (let i = 0; i < emptyStars; i++) {
                 stars.push('<div class="star empty"></div>');
             }
-
+    
             return stars.join('');
         }
-
+    
         // Initial load (optional, could be a default category)
         loadHealthcare('healthcare.clinic_or_praxis');
     </script>
+    
+    
 </body>
+
 </html>

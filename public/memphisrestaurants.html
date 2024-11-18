@@ -53,11 +53,8 @@
         <nav>
             <ul>
                 <li><a href="OriginalWebPage.html">Main Menu</a></li>
-                <li><a href="chattanooga.html">Home</a></li>
-                <li><a href="restaurants.html">Restaurants</a></li>
-                <li><a href="hotels.html">Hotels</a></li>
-                <li><a href="entertainment.html">Entertainment</a></li>
-                <li><a href="healthcare.html">Healthcare</a></li>
+                <li><a href="memphis.html">Home</a></li>
+                <li><a href="memphisrestaurants.html">Restaurants</a></li>
             </ul>
         </nav>
     </header>
@@ -68,142 +65,163 @@
 
     <script>
         const placeList = document.getElementById('place-list');
-
+    
         // Function to fetch restaurants from the server
         async function loadRestaurants() {
-    try {
-        const response = await fetch('/memphisrestaurants');
-        const places = await response.json();
-
-        placeList.innerHTML = '';  // Clear the loading message
-
-        if (places.length > 0) {
-            places.forEach((place) => {
-                const name = place.name || 'Name not available';
-                const streetAddress = place.address || 'Street address not available';
-                const city = place.city || 'City not available';
-                const phone = place.phone || 'Phone number not available';
-                const website = place.website || 'Website not available';
-                const placeId = place.placeId;
-                const ratings = place.ratings || [];
-                const ratingCount = ratings.length;
-                const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
-
-                // Create HTML element for each place
-                const item = document.createElement('div');
-                item.classList.add('place-item');
-                item.innerHTML = `
-                    <h3>${name}</h3>
-                    <p><strong>Street Address:</strong> ${streetAddress}</p>
-                    <p><strong>City:</strong> ${city}</p>
-                    <p><strong>Phone:</strong> ${phone}</p>
-                    <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
-                    <div>
-                        <strong>Rating: </strong>
-                        <div id="rating-${placeId}" class="stars">${renderStars(averageRating)}</div>
-                        <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
-                    </div>
-
-                    <h4>Comments:</h4>
-                    <ul id="comments-list-${placeId}">
-                        <!-- Comments will go here -->
-                    </ul>
-
-                    <form id="rating-form-${placeId}">
-                        <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
-                        <button type="submit">Submit Rating</button>
-                    </form>
-
-                    <form id="comment-form-${placeId}">
-                        <textarea name="comment" placeholder="Your comment here..." required></textarea>
-                        <button type="submit">Submit Comment</button>
-                    </form>
-                `;
-                placeList.appendChild(item);
-
-                // Render existing comments if any
-                const commentsList = document.getElementById(`comments-list-${placeId}`);
-                if (place.comments && place.comments.length > 0) {
-                    place.comments.forEach(comment => {
-                        const commentItem = document.createElement('li');
-                        commentItem.textContent = comment.text || 'No comment text available';
-                        commentsList.appendChild(commentItem);
-                    });
+            try {
+                const response = await fetch('/memphisrestaurants');
+                const places = await response.json();
+    
+                placeList.innerHTML = '';  // Clear the loading message
+    
+                if (places.length > 0) {
+                    places.forEach((place) => {
+                        const name = place.name || 'Name not available';
+                        const streetAddress = place.address || 'Street address not available';
+                        const city = place.city || 'City not available';
+                        const phone = place.phone || 'Phone number not available';
+                        const website = place.website || 'Website not available';
+                        const placeId = place.placeId;
+                        const ratings = place.ratings || [];
+                        const ratingCount = ratings.length;
+                        const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+                        // Create HTML element for each place
+                        const item = document.createElement('div');
+                        item.classList.add('place-item');
+                        item.innerHTML = `
+                            <h3>${name}</h3>
+                            <p><strong>Street Address:</strong> ${streetAddress}</p>
+                            <p><strong>City:</strong> ${city}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
+                            <div>
+                                <strong>Rating: </strong>
+                                <div id="rating-${placeId}" class="stars">${renderStars(averageRating)}</div>
+                                <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
+                            </div>
+    
+                            <h4>Comments:</h4>
+                            <ul id="comments-list-${placeId}">
+                                <!-- Comments will go here -->
+                            </ul>
+    
+                            <form id="rating-form-${placeId}">
+                                <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
+                                <button type="submit">Submit Rating</button>
+                            </form>
+    
+                            <form id="comment-form-${placeId}">
+                                <textarea name="comment" placeholder="Your comment here..." required></textarea>
+                                <button type="submit">Submit Comment</button>
+                            </form>
+                        `;
+                        placeList.appendChild(item);
+    
+                        // Render existing comments if any
+                        const commentsList = document.getElementById(`comments-list-${placeId}`);
+                        if (place.comments && place.comments.length > 0) {
+                            place.comments.forEach(comment => {
+                                const commentItem = document.createElement('li');
+                                commentItem.textContent = comment.text || 'No comment text available';
+                                commentsList.appendChild(commentItem);
+                            });
+                        }
+    
+                        // Event listener for the rating form
+                        document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            console.log("Submit button clicked!");
+    
+                            // Log the event target (the form itself) to inspect its contents
+                            console.log(event.target);  // This should log the entire form element
+    
+                            const ratingInput = event.target.rating;
+                            if (!ratingInput) {
+                                console.error("Rating input not found!");
+                                return;
+                            }
+    
+                            const rating = parseInt(ratingInput.value);
+    
+                            console.log("Rating submitted:", { rating});  // Log the values to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            const response = await fetch(`/rate/memphis/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ rating })
+                            });
+    
+                            if (response.ok) {
+                                alert('Rating submitted successfully!');
+                                loadRestaurants();  // Reload the places to show updated ratings and comments
+                            } else {
+                                alert('Error submitting rating');
+                            }
+                        });
+    
+                        // Event listener for the comment form
+                        document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const comment = event.target.comment.value;
+    
+                            const city = place.city.toLowerCase();  // Dynamically get the city
+                            console.log("City for comment:", city);  // Log to ensure city is correct
+    
+                            const response = await fetch(`/comment/${city}/${placeId}`, {  // Include the city in the route
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ text: comment })
+                            });
+    
+                            if (response.ok) {
+                                alert('Comment posted successfully!');
+                                loadRestaurants();  // Reload the places to show updated comments
+                            } else {
+                                alert('Error posting comment');
+                            }
+                        });
+    
+                    });  // Closing forEach
+                } else {
+                    placeList.innerHTML = '<p>No restaurants found.</p>';
                 }
-
-                // Event listeners for rating and comment forms
-                document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const rating = event.target.rating.value;
-
-                    const response = await fetch(`/rate/${placeId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ rating })
-                    });
-
-                    if (response.ok) {
-                        alert('Rating submitted successfully!');
-                        loadRestaurants();  // Reload the places to show updated ratings
-                    } else {
-                        alert('Error submitting rating');
-                    }
-                });
-
-                document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const comment = event.target.comment.value;
-
-                    const response = await fetch(`/comment/${placeId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ text: comment })
-                    });
-
-                    if (response.ok) {
-                        alert('Comment posted successfully!');
-                        loadRestaurants(); // Refresh the restaurant list
-                    } else {
-                        alert('Error posting comment');
-                    }
-                });
-            });
-        } else {
-            placeList.innerHTML = '<p>No restaurants found.</p>';
+            } catch (error) {
+                console.error('Error fetching restaurant data:', error);
+                placeList.innerHTML = '<p>Error loading restaurants.</p>';
+            }
         }
-    } catch (error) {
-        console.error('Error fetching restaurant data:', error);
-        placeList.innerHTML = '<p>Error loading restaurants.</p>';
-    }
-}
-
-
-
+    
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
             const stars = [];
-
+    
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
+    
             for (let i = 0; i < fullStars; i++) {
                 stars.push('<div class="star full"></div>');
             }
-
+    
             if (halfStar) stars.push('<div class="star half"></div>');
             for (let i = 0; i < emptyStars; i++) {
                 stars.push('<div class="star empty"></div>');
             }
-
+    
             return stars.join('');
         }
-
+    
         loadRestaurants();  // Initial call to load restaurants
     </script>
 </body>
-</html>
+</html>    

@@ -67,15 +67,15 @@
 
     <script>
         const placeList = document.getElementById('place-list');
-
+    
         // Function to fetch hotels from the server
         async function loadHotels() {
             try {
                 const response = await fetch('/hotels');  // Fetch hotels data from the backend
                 const places = await response.json();
-
+    
                 placeList.innerHTML = '';  // Clear the loading message
-
+    
                 if (places.length > 0) {
                     places.forEach((place) => {
                         const name = place.name || 'Name not available';
@@ -87,7 +87,7 @@
                         const ratings = place.ratings || [];
                         const ratingCount = ratings.length;
                         const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
-
+    
                         // Create HTML element for each hotel
                         const item = document.createElement('div');
                         item.classList.add('place-item');
@@ -102,24 +102,24 @@
                                 <div id="rating-${placeId}" class="stars">${renderStars(averageRating)}</div>
                                 <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
                             </div>
-
+    
                             <h4>Comments:</h4>
                             <ul id="comments-list-${placeId}">
                                 <!-- Comments will go here -->
                             </ul>
-
+    
                             <form id="rating-form-${placeId}">
                                 <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
                                 <button type="submit">Submit Rating</button>
                             </form>
-
+    
                             <form id="comment-form-${placeId}">
                                 <textarea name="comment" placeholder="Your comment here..." required></textarea>
                                 <button type="submit">Submit Comment</button>
                             </form>
                         `;
                         placeList.appendChild(item);
-
+    
                         // Render existing comments if any
                         const commentsList = document.getElementById(`comments-list-${placeId}`);
                         if (place.comments && place.comments.length > 0) {
@@ -129,48 +129,70 @@
                                 commentsList.appendChild(commentItem);
                             });
                         }
-
-                        // Event listeners for rating and comment forms
+    
+                        // Event listener for the rating form
                         document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
-                            const rating = event.target.rating.value;
-
-                            const response = await fetch(`/rate/${placeId}`, {
+                            console.log("Submit button clicked!");  // Debugging log
+    
+                            const ratingInput = event.target.rating;
+                            if (!ratingInput) {
+                                console.error("Rating input not found!");
+                                return;
+                            }
+    
+                            const rating = parseInt(ratingInput.value);
+                            console.log("Rating submitted:", { rating });  // Log the values to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            const response = await fetch(`/rate/${place.city.toLowerCase()}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({ rating })
                             });
-
+    
+                            console.log('Response status:', response.status);  // Log response status for debugging
+                            console.log('Response text:', await response.text());  // Log the response text
+    
                             if (response.ok) {
                                 alert('Rating submitted successfully!');
-                                loadHotels();  // Reload the places to show updated ratings
+                                loadHotels();  // Reload the hotels to show updated ratings
                             } else {
                                 alert('Error submitting rating');
                             }
                         });
-
+    
+                        // Event listener for the comment form
                         document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
                             event.preventDefault();
                             const comment = event.target.comment.value;
-
-                            const response = await fetch(`/comment/${placeId}`, {
+    
+                            const city = place.city.toLowerCase();  // Dynamically get the city
+                            console.log("City for comment:", city);  // Log to ensure city is correct
+    
+                            const response = await fetch(`/comment/${city}/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({ text: comment })
                             });
-
+    
                             if (response.ok) {
                                 alert('Comment posted successfully!');
-                                loadHotels(); // Refresh the hotel list
+                                loadHotels();  // Reload the places to show updated comments
                             } else {
                                 alert('Error posting comment');
                             }
                         });
-                    });
+    
+                    });  // Closing forEach
                 } else {
                     placeList.innerHTML = '<p>No hotels found.</p>';
                 }
@@ -179,29 +201,31 @@
                 placeList.innerHTML = '<p>Error loading hotels.</p>';
             }
         }
-
+    
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
             const stars = [];
-
+    
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
+    
             for (let i = 0; i < fullStars; i++) {
                 stars.push('<div class="star full"></div>');
             }
-
+    
             if (halfStar) stars.push('<div class="star half"></div>');
             for (let i = 0; i < emptyStars; i++) {
                 stars.push('<div class="star empty"></div>');
             }
-
+    
             return stars.join('');
         }
-
+    
         loadHotels();  // Initial call to load hotels
     </script>
+    
 </body>
 </html>
+
 

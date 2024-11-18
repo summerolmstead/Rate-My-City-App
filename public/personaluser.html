@@ -144,6 +144,9 @@
                 <input list="cities" id="cityInput" placeholder="Select or search for a city...">
                 <datalist id="cities">
                     <option value="Chattanooga">
+                    <option value="Memphis">
+
+                    </option>
                 </datalist>
                 <button onclick="searchCity()">Search</button>
             </div>
@@ -167,6 +170,10 @@
         {
             window.location.href = 'chattanooga.html';
         } 
+        else if(cityInput.toLowerCase() === 'memphis') // need to add memphis!!
+        {
+            window.location.href = 'memphis.html';
+        }
         else 
         {
             alert('Choose or type a city.');
