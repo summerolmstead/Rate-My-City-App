@@ -86,7 +86,7 @@ app.get('/memphis', (req, res) => {
 
 //redirect to city of knoxville
 app.get('/knoxville', (req, res) => {
-    res.sendFile(__dirname + '/public/memphis.html');
+    res.sendFile(__dirname + '/public/knoxville.html');
 });
 
 //redirect to nashville
@@ -221,7 +221,7 @@ app.get('/knoxvillehotels', async (req, res) => {
   app.get('/nashvillehotels', async (req, res) => {
     try {
       //fetch places where category is 'accommodation.hotel'
-      const hotels = await KnoxvillePlace.find({ category: 'accommodation.hotel' }).populate('comments');  // Populate comments if they are stored as references
+      const hotels = await NashvillePlace.find({ category: 'accommodation.hotel' }).populate('comments');  // Populate comments if they are stored as references
       
       if (hotels.length > 0) {
         res.json(hotels);  
@@ -294,7 +294,7 @@ app.get('/memphisentertainment/:category', async (req, res) => {
       }
   
       //fetch places based on category
-      const places = await Place.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+      const places = await MemphisPlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
   
       if (places.length > 0) {
         res.json(places);  //send the places as JSON
@@ -330,7 +330,7 @@ app.get('/knoxvilleentertainment/:category', async (req, res) => {
       }
   
       //fetch places based on category
-      const places = await Place.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+      const places = await KnoxvillePlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
   
       if (places.length > 0) {
         res.json(places);  //send the places as JSON
@@ -365,7 +365,7 @@ app.get('/nashvilleentertainment/:category', async (req, res) => {
       }
   
       //fetch places based on category
-      const places = await Place.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+      const places = await NashvillePlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
   
       if (places.length > 0) {
         res.json(places);  //send the places as JSON
@@ -416,8 +416,8 @@ app.get('/memphishealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'healthcare.hospital', 
-            'healthcare.clinic_or_praxis' 
+            'memphishealthcare.hospital', 
+            'memphishealthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -446,8 +446,8 @@ app.get('/knoxvillehealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'healthcare.hospital', 
-            'healthcare.clinic_or_praxis' 
+            'knoxvillehealthcare.hospital', 
+            'knoxvillehealthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -477,8 +477,8 @@ app.get('/nashvillehealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'healthcare.hospital', 
-            'healthcare.clinic_or_praxis' 
+            'nashvillehealthcare.hospital', 
+            'nashvillehealthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -648,8 +648,8 @@ async function fetchAndStorePlacesForCategoryKnoxville(category) {
         console.log(`Fetching places for category: ${category}`); // log the start of fetching
         
         // Knoxville latitude and longitude
-        const lat = 36.05285615;  // Latitude for Knoxville
-        const lon = -83.9966709135571 // Longitude for Knoxville
+        const lat =  35.9993666;  // Latitude for Knoxville
+        const lon = -83.77390810730519 // Longitude for Knoxville
 
         // Construct API request URL for Geoapify Places API with specific category
         const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
@@ -715,8 +715,8 @@ async function fetchAndStorePlacesForCategory(category) {
         console.log(`Fetching places for category: ${category}`); //log the start of fetching
         
         // ( Nashville, TN) if use this for other cities CHANGE THIS TO THEIR LOCATION IN THE AP
-        const lat = 36.1928354;
-        const lon = -86.7439239;
+        const lat = 36.295369699999995;
+        const lon = -86.6950650513633;
 
         //aPI request URL for Geoapify Places API with a specific category like 'catering.restaurant.pizza'
         const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
@@ -823,8 +823,8 @@ async function fetchAndStorePlacesForCategory(category) {
 
 
 //Nashville
-//fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); // Run this to populate knoxville hotels - Nandni
-//fetchAndStorePlacesForCategoryNashville('catering.restaurant');  // Fetch and store knoxville restaurants - nandni
+//fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); // Run this to populate nashville hotels - Nandni
+//fetchAndStorePlacesForCategoryNashville('catering.restaurant');  // Fetch and store nashville restaurants - nandni
 //fetchAndStorePlacesForCategoryNashville('healthcare.clinic_or_praxis');
 //fetchAndStorePlacesForCategoryNashville('healthcare.hospital');
 //fetchAndStorePlacesForCategoryNashville('entertainment.bowling_alley');
@@ -991,7 +991,7 @@ app.post('/rate/memphis/:placeId', async (req, res) => {
 });
 
 // Knoxville-specific rating submission route
-app.post('/rate/knosville/:placeId', async (req, res) => {
+app.post('/rate/knoxville/:placeId', async (req, res) => {
     const { placeId } = req.params;
     const { rating } = req.body;
 
