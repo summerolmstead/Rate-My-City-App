@@ -145,6 +145,8 @@
             <input list="cities" id="cityInput" placeholder="Select or search for a city...">
             <datalist id="cities">
                 <option value="Chattanooga">
+                <option value="Memphis"> <!--summer adding for test-->
+                </option>
             </datalist>
             <button onclick="searchCity()">Search</button>
         </div>
@@ -172,7 +174,13 @@
             var cityInput = document.getElementById('cityInput').value;
             if (cityInput.toLowerCase() === 'chattanooga') {
                 window.location.href = 'chattanooga.html';
-            } else {
+            } 
+            else if(cityInput.toLowerCase() === 'memphis')
+            {
+                window.location.href = "memphis.html"; //summer adding memphis to test if works w/ general logic
+            }
+            else 
+            {
                 alert('Choose or type a city.');
             }
         }
