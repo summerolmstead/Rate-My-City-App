@@ -710,13 +710,13 @@ async function fetchAndStorePlacesForCategoryKnoxville(category) {
 }
 
 // for Nashville
-async function fetchAndStorePlacesForCategory(category) {
+async function fetchAndStorePlacesForCategoryNashville(category) {
     try {
         console.log(`Fetching places for category: ${category}`); //log the start of fetching
         
         // ( Nashville, TN) if use this for other cities CHANGE THIS TO THEIR LOCATION IN THE AP
-        const lat = 36.295369699999995;
-        const lon = -86.6950650513633;
+        const lat = 36.143358699750074;
+        const lon = -86.66267662270768;
 
         //aPI request URL for Geoapify Places API with a specific category like 'catering.restaurant.pizza'
         const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
@@ -823,10 +823,8 @@ async function fetchAndStorePlacesForCategory(category) {
 
 
 //Nashville - this is still left - RUN THIS FROM NODE SERVER>JS in TERMINAL
-//fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); // Run this to populate nashville hotels - Nandni
-//fetchAndStorePlacesForCategoryNashville('catering.restaurant');  // Fetch and store nashville restaurants - nandni
-//fetchAndStorePlacesForCategoryNashville('healthcare.clinic_or_praxis');
-//fetchAndStorePlacesForCategoryNashville('healthcare.hospital');
+//fetchAndStorePlacesForCategoryNashville('catering.restaurant');  
+//fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); 
 //fetchAndStorePlacesForCategoryNashville('entertainment.bowling_alley');
 //fetchAndStorePlacesForCategoryNashville('entertainment.aquarium');
 //fetchAndStorePlacesForCategoryNashville('entertainment.zoo');
@@ -835,7 +833,8 @@ async function fetchAndStorePlacesForCategory(category) {
 //fetchAndStorePlacesForCategoryNashville('entertainment.miniature_golf');
 //fetchAndStorePlacesForCategoryNashville('entertainment.theme_park');
 //fetchAndStorePlacesForCategoryNashville('entertainment.water_park');
-
+//fetchAndStorePlacesForCategoryNashville('healthcare.clinic_or_praxis');
+//fetchAndStorePlacesForCategoryNashville('healthcare.hospital');
 
 
 
@@ -1025,7 +1024,7 @@ app.post('/rate/nashville/:placeId', async (req, res) => {
     console.log("Rating submission for Nashville placeId:", placeId);  // Log to check
 
     try {
-        // Find the place in the Memphis database
+        // Find the place in the Nashville database
         const place = await NashvillePlace.findOne({ placeId });
 
         if (!place) {
