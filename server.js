@@ -8,12 +8,14 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const fetch = require('node-fetch');  // This works fine with v2.x must install - Summer
-const bcrypt = require('bcrypt');
 
 //import the already defined models in /models where all db tables defined
 const Place = require('./models/Place');  // Already defined in models/Place.js
 const User = require('./models/User');    // Already defined in models/User.js
 const MemphisPlace = require('./models/MemphisPlace');
+const KnoxvillePlace = require('./models/KnoxvillePlace');
+const NashvillePlace = require('./models/NashvillePlace');
+
 
 const app = express();
 const PORT = process.env.PORT || 3307;
@@ -82,7 +84,18 @@ app.get('/memphis', (req, res) => {
     res.sendFile(__dirname + '/public/memphis.html');
 });
 
-//for OG chattanooga as it was the demo originally 
+//redirect to city of knoxville
+app.get('/knoxville', (req, res) => {
+    res.sendFile(__dirname + '/public/knoxville.html');
+});
+
+//redirect to nashville
+app.get('/nashville', (req, res) => {
+    res.sendFile(__dirname + '/public/nashville.html');
+});
+
+
+// Chattanooga Restaurants
 app.get('/restaurants', async (req, res) => {
     try {
       
@@ -99,6 +112,7 @@ app.get('/restaurants', async (req, res) => {
     }
   });
 
+  // Memphis restaurants 
   app.get('/memphisrestaurants', async (req, res) => {
     try {
         // Use the correct model name (MemphisPlace, not MemphisPlacePlace)
@@ -115,7 +129,43 @@ app.get('/restaurants', async (req, res) => {
     }
 });
 
+ // Knoxville restaurants 
+ app.get('/knoxvillerestaurants', async (req, res) => {
+    try {
+        // Use the correct model name (MemphisPlace, not MemphisPlacePlace)
+        const restaurants = await KnoxvillePlace.find({ category: 'catering.restaurant' }).populate('comments'); // Populating comments if necessary
 
+        if (restaurants.length > 0) {
+            res.json(restaurants);
+        } else {
+            res.status(404).json({ message: 'No restaurants found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching restaurants:', error);
+        res.status(500).json({ message: 'Error fetching restaurants.' });
+    }
+});
+
+// Nashville restaurants 
+app.get('/nashvillerestaurants', async (req, res) => {
+    try {
+        // Use the correct model name (MemphisPlace, not MemphisPlacePlace)
+        const restaurants = await NashvillePlace.find({ category: 'catering.restaurant' }).populate('comments'); // Populating comments if necessary
+
+        if (restaurants.length > 0) {
+            res.json(restaurants);
+        } else {
+            res.status(404).json({ message: 'No restaurants found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching restaurants:', error);
+        res.status(500).json({ message: 'Error fetching restaurants.' });
+    }
+});
+
+
+
+// Chattanooga hotels
   app.get('/hotels', async (req, res) => {
     try {
       //fetch places where category is 'accommodation.hotel'
@@ -132,7 +182,62 @@ app.get('/restaurants', async (req, res) => {
     }
   });
   
-  //route for fetching entertainment places by category
+  
+// Memphis hotels
+app.get('/memphishotels', async (req, res) => {
+    try {
+      //fetch places where category is 'accommodation.hotel'
+      const hotels = await MemphisPlace.find({ category: 'accommodation.hotel' }).populate('comments');  // Populate comments if they are stored as references
+      
+      if (hotels.length > 0) {
+        res.json(hotels);  
+      } else {
+        res.status(404).json({ message: 'No hotels found.' });  
+      }
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+      res.status(500).json({ message: 'Error fetching hotels.' });  
+    }
+  });
+
+  // Knoxville hotels
+app.get('/knoxvillehotels', async (req, res) => {
+    try {
+      //fetch places where category is 'accommodation.hotel'
+      const hotels = await KnoxvillePlace.find({ category: 'accommodation.hotel' }).populate('comments');  // Populate comments if they are stored as references
+      
+      if (hotels.length > 0) {
+        res.json(hotels);  
+      } else {
+        res.status(404).json({ message: 'No hotels found.' });  
+      }
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+      res.status(500).json({ message: 'Error fetching hotels.' });  
+    }
+  });
+
+  // Nashville hotels
+  app.get('/nashvillehotels', async (req, res) => {
+    try {
+      //fetch places where category is 'accommodation.hotel'
+      const hotels = await NashvillePlace.find({ category: 'accommodation.hotel' }).populate('comments');  // Populate comments if they are stored as references
+      
+      if (hotels.length > 0) {
+        res.json(hotels);  
+      } else {
+        res.status(404).json({ message: 'No hotels found.' });  
+      }
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+      res.status(500).json({ message: 'Error fetching hotels.' });  
+    }
+  });
+  
+  
+
+
+//Chattanooga Entertaiment
 app.get('/entertainment/:category', async (req, res) => {
     try {
       const { category } = req.params;
@@ -154,7 +259,113 @@ app.get('/entertainment/:category', async (req, res) => {
       }
   
       //fetch places based on category
-      const places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+      const places = await Place.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+  
+      if (places.length > 0) {
+        res.json(places);  //send the places as JSON
+      } else {
+        res.status(404).json({ message: 'No entertainment places found.' });
+      }
+    } catch (error) {
+      console.error('Error fetching entertainment places:', error);
+      res.status(500).json({ message: 'Error fetching entertainment places.' });
+    }
+  });
+
+  //Memphis Entertaiment
+app.get('/memphisentertainment/:category', async (req, res) => {
+    try {
+      const { category } = req.params;
+  
+      //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
+      const validCategories = [
+        'memphisentertainment.bowling_alley', 
+        'memphisentertainment.aquarium',
+        'memphisentertainment.zoo',
+        'memphisentertainment.museum',
+        'memphisentertainment.escape_game',
+        'memphisentertainment.miniature_golf',
+        'memphisentertainment.theme_park',
+        'memphisentertainment.water_park'
+      ];
+  
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ message: 'Invalid category' });
+      }
+  
+      //fetch places based on category
+      const places = await MemphisPlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+  
+      if (places.length > 0) {
+        res.json(places);  //send the places as JSON
+      } else {
+        res.status(404).json({ message: 'No entertainment places found.' });
+      }
+    } catch (error) {
+      console.error('Error fetching entertainment places:', error);
+      res.status(500).json({ message: 'Error fetching entertainment places.' });
+    }
+  });
+
+
+//Knoxville Entertaiment
+app.get('/knoxvilleentertainment/:category', async (req, res) => {
+    try {
+      const { category } = req.params;
+  
+      //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
+      const validCategories = [
+        'knoxvilleentertainment.bowling_alley', 
+        'knoxvilleentertainment.aquarium',
+        'knoxvilleentertainment.zoo',
+        'knoxvilleentertainment.museum',
+        'knoxvilleentertainment.escape_game',
+        'knoxvilleentertainment.miniature_golf',
+        'knoxvilleentertainment.theme_park',
+        'knoxvilleentertainment.water_park'
+      ];
+  
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ message: 'Invalid category' });
+      }
+  
+      //fetch places based on category
+      const places = await KnoxvillePlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+  
+      if (places.length > 0) {
+        res.json(places);  //send the places as JSON
+      } else {
+        res.status(404).json({ message: 'No entertainment places found.' });
+      }
+    } catch (error) {
+      console.error('Error fetching entertainment places:', error);
+      res.status(500).json({ message: 'Error fetching entertainment places.' });
+    }
+  });
+
+//Nashville Entertaiment
+app.get('/nashvilleentertainment/:category', async (req, res) => {
+    try {
+      const { category } = req.params;
+  
+      //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
+      const validCategories = [
+        'nashvilleentertainment.bowling_alley', 
+        'nashvilleentertainment.aquarium',
+        'nashvilleentertainment.zoo',
+        'nashvilleentertainment.museum',
+        'nashvilleentertainment.escape_game',
+        'nashvilleentertainment.miniature_golf',
+        'nashvilleentertainment.theme_park',
+        'nashvilleentertainment.water_park'
+      ];
+  
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ message: 'Invalid category' });
+      }
+  
+      //fetch places based on category
+      const places = await NashvillePlace.find({ category }).populate('comments');  // Populate comments if they existconst places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
   
       if (places.length > 0) {
         res.json(places);  //send the places as JSON
@@ -168,8 +379,7 @@ app.get('/entertainment/:category', async (req, res) => {
   });
   
 
-//route to get healthcare places in Chattanooga (clinics and hospitals)
-// Healthcare route
+// Healthcare route - Chattanooga
 app.get('/healthcare/:category', async (req, res) => {
     try {
         const { category } = req.params;
@@ -199,7 +409,96 @@ app.get('/healthcare/:category', async (req, res) => {
     }
 });
 
+//healthcare in memphis
+app.get('/memphishealthcare/:category', async (req, res) => {
+    try {
+        const { category } = req.params;
+  
+        // Categories to check from the API
+        const validCategories = [
+            'memphishealthcare.hospital', 
+            'memphishealthcare.clinic_or_praxis' 
+        ];
+  
+        // Check if the provided category is valid
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({ message: 'Invalid category' });
+        }
+  
+        // Fetch places based on category and city (Memphis)
+        const places = await MemphisPlace.find({ category, city: 'Memphis' }).populate('comments');  // Populate comments if they exist
+  
+        if (places.length > 0) {
+            res.json(places);  // Send the places as JSON
+        } else {
+            res.status(404).json({ message: 'No healthcare places found in Memphis.' });
+        }
+    } catch (error) {
+        console.error('Error fetching healthcare places in Memphis:', error);
+        res.status(500).json({ message: 'Error fetching healthcare places in Memphis.' });
+    }
+});
 
+// Healthcare route - Knoxville
+app.get('/knoxvillehealthcare/:category', async (req, res) => {
+    try {
+        const { category } = req.params;
+  
+        // Categories to check from the API
+        const validCategories = [
+            'knoxvillehealthcare.hospital', 
+            'knoxvillehealthcare.clinic_or_praxis' 
+        ];
+  
+        // Check if the provided category is valid
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({ message: 'Invalid category' });
+        }
+  
+        // Fetch places based on category
+        const places = await KnoxvillePlace.find({ category }).populate('comments');  // Populate comments if they exist
+  
+        if (places.length > 0) {
+            res.json(places);  // Send the places as JSON
+        } else {
+            res.status(404).json({ message: 'No healthcare places found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching healthcare places:', error);
+        res.status(500).json({ message: 'Error fetching healthcare places.' });
+    }
+});
+
+
+// Healthcare route - Nashville
+app.get('/nashvillehealthcare/:category', async (req, res) => {
+    try {
+        const { category } = req.params;
+  
+        // Categories to check from the API
+        const validCategories = [
+            'nashvillehealthcare.hospital', 
+            'nashvillehealthcare.clinic_or_praxis' 
+        ];
+  
+        // Check if the provided category is valid
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({ message: 'Invalid category' });
+        }
+  
+        // Fetch places based on category
+        const places = await NashvillePlace.find({ category }).populate('comments');  // Populate comments if they exist
+  
+        if (places.length > 0) {
+            res.json(places);  // Send the places as JSON
+        } else {
+            res.status(404).json({ message: 'No healthcare places found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching healthcare places:', error);
+        res.status(500).json({ message: 'Error fetching healthcare places.' });
+    }
+});
 
   
 
@@ -343,10 +642,143 @@ async function fetchAndStorePlacesForCategoryMemphis(category) {
 }
 
 
+// for knoxville - Nandni
+async function fetchAndStorePlacesForCategoryKnoxville(category) {
+    try {
+        console.log(`Fetching places for category: ${category}`); // log the start of fetching
+        
+        // Knoxville latitude and longitude
+        const lat =  35.9993666;  // Latitude for Knoxville
+        const lon = -83.77390810730519 // Longitude for Knoxville
+
+        // Construct API request URL for Geoapify Places API with specific category
+        const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
+        console.log(`Requesting API URL: ${apiUrl}`); // log the URL being requested
+
+        // Fetch the data from the Geoapify API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Log raw API response for debugging
+        console.log('Raw API Response:', data);
+
+        // Check if valid data is returned
+        if (!data || !data.features || data.features.length === 0) {
+            console.log(`No places found for category: ${category}`);
+            return;
+        }
+
+        // Loop through the fetched places and save them to MongoDB
+        for (let placeData of data.features) {
+            const place = placeData.properties;
+
+            // Log each place being processed
+            console.log(`Processing place: ${place.name || 'Unnamed Place'}, ID: ${place.place_id}`);
+
+            // Check if the place already exists in the database by placeId
+            const existingPlace = await KnoxvillePlace.findOne({ placeId: place.place_id });
+
+            // Log if the place already exists or needs to be created
+            if (existingPlace) {
+                console.log(`Place already exists in the database: ${place.name}`);
+            } else {
+                console.log(`Creating new place: ${place.name || 'Unnamed Place'}`);
+
+                // If the place doesn't exist, create a new place document and save it
+                const newPlace = new KnoxvillePlace({
+                    placeId: place.place_id,
+                    name: place.name || "Unknown Name",
+                    address: place.address_line1 || "Unknown Address",
+                    city: 'Knoxville',  // Set city to 'Knoxville' explicitly
+                    phone: place.phone || "Unknown Phone",
+                    website: place.website || "Unknown Website",
+                    category: category,  // Store the category for clarity (e.g., restaurant, hotel, etc.)
+                    ratings: [],  // Initialize with empty ratings array
+                    comments: []  // Initialize with empty comments array
+                });
+
+                // Save the new place to the database
+                await newPlace.save();
+                console.log(`Created and saved new place: ${place.name}`);  // For debugging
+            }
+        }
+
+        console.log(`Successfully fetched and stored places for category: ${category}`);
+    } catch (error) {
+        console.error('Error fetching and storing places:', error);
+    }
+}
+
+// for Nashville
+async function fetchAndStorePlacesForCategoryNashville(category) {
+    try {
+        console.log(`Fetching places for category: ${category}`); //log the start of fetching
+        
+        // ( Nashville, TN) if use this for other cities CHANGE THIS TO THEIR LOCATION IN THE AP
+        const lat = 36.143358699750074;
+        const lon = -86.66267662270768;
+
+        //aPI request URL for Geoapify Places API with a specific category like 'catering.restaurant.pizza'
+        const apiUrl = `https://api.geoapify.com/v2/places?categories=${category}&lat=${lat}&lon=${lon}&apiKey=${API_KEY}`;
+        console.log(`Requesting API URL: ${apiUrl}`); //logging
+
+        //fetch the data from the Geoapify API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        //debugging the raw API response
+        console.log('Raw API Response:', data); //log the raw response from Geoapify
+
+        //check if we got valid data
+        if (!data || !data.features || data.features.length === 0) {
+            console.log(`No places found for category: ${category}`);
+            return;
+        }
+
+        //loop through the fetched places and save them to MongoDB
+        for (let placeData of data.features) {
+            const place = placeData.properties;
+
+            //log each place being processed
+            console.log(`Processing place: ${place.name || 'Unnamed Place'}, ID: ${place.place_id}`);
+
+            //check if the place already exists in the database
+            const existingPlace = await NashvillePlace.findOne({ placeId: place.place_id });
+
+            //log whether the place already exists or needs to be created
+            if (existingPlace) {
+                console.log(`Place already exists in the database: ${place.name}`);
+            } else {
+                console.log(`Creating new place: ${place.name || 'Unnamed Place'}`);
+
+                //if the place doesn't exist, create and save it
+                const newPlace = new NashvillePlace({
+                    placeId: place.place_id,
+                    name: place.name || "Unknown Name",
+                    address: place.address_line1 || "Unknown Address",
+                    city: place.city || "Unknown City",
+                    phone: place.phone || "Unknown Phone",
+                    website: place.website || "Unknown Website",
+                    category: category,  //the category to store in db so it doesnt get confused with other in table!!!
+                    ratings: [],  //initialize with empty ratings
+                    comments: []  //initialize with empty comments
+                });
+
+                await newPlace.save();  //save the new place to the database
+                console.log(`Created and saved new place: ${place.name}`); //for debugging
+            }
+        }
+
+        console.log(`Successfully fetched and stored places for category: ${category}`);
+    } catch (error) {
+        console.error('Error fetching and storing places:', error);
+    }
+}
+
+//CHATTANOOGA//
 // Call this function once to populate your database with restaurant data
 //fetchAndStorePlacesForCategory('catering.restaurant');  // Fetch and store restaurants - summer successfully called YESSSSSS
 //fetchAndStorePlacesForCategory('accommodation.hotel'); //calling hotels ONCE!! summer: success :D
-//the following are fore the entertainment page!
 //fetchAndStorePlacesForCategory('entertainment.bowling_alley');
 //fetchAndStorePlacesForCategory('entertainment.aquarium');
 //fetchAndStorePlacesForCategory('entertainment.zoo');
@@ -355,78 +787,91 @@ async function fetchAndStorePlacesForCategoryMemphis(category) {
 //fetchAndStorePlacesForCategory('entertainment.miniature_golf');
 //fetchAndStorePlacesForCategory('entertainment.theme_park');
 //fetchAndStorePlacesForCategory('entertainment.water_park');
-
-//for healthcare html categories:  STATEMENTS ARE SUCCESS FOR HEALTHCARE -summer
 //fetchAndStorePlacesForCategory('healthcare.clinic_or_praxis');
 //fetchAndStorePlacesForCategory('healthcare.hospital');
 
-
+//MEMPHIS// - DO NOT GO AGAIN!!! - already at 206 places. NANDNI ALREADY COMPLETED.
 //testing memphis restaurants summer !!!!! only run once remember ->
 //fetchAndStorePlacesForCategoryMemphis('catering.restaurant'); SUCCESS DO NOT CALL AGAIN LOL
+//fetchAndStorePlacesForCategoryMemphis('accommodation.hotel'); // Run this to populate Memphis hotels - Nandni 
+//fetchAndStorePlacesForCategoryMemphis('entertainment.bowling_alley');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.aquarium');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.zoo');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.museum');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.escape_game');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.miniature_golf');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.theme_park');
+//fetchAndStorePlacesForCategoryMemphis('entertainment.water_park');
+//fetchAndStorePlacesForCategoryMemphis('healthcare.clinic_or_praxis');
+//fetchAndStorePlacesForCategoryMemphis('healthcare.hospital');
+
+
+//KNOXVILLE// - DO NOT DO AGAIN!!! - NANDNI ALREADY COMPLETED.
+//fetchAndStorePlacesForCategoryKnoxville('accommodation.hotel'); // Run this to populate knoxville hotels - Nandni
+//fetchAndStorePlacesForCategoryKnoxville('catering.restaurant');  // Fetch and store knoxville restaurants - nandni
+//fetchAndStorePlacesForCategoryKnoxville('healthcare.clinic_or_praxis');
+//fetchAndStorePlacesForCategoryKnoxville('healthcare.hospital');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.bowling_alley');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.aquarium');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.zoo');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.museum');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.escape_game');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.miniature_golf');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.theme_park');
+//fetchAndStorePlacesForCategoryKnoxville('entertainment.water_park');
 
 
 
-// Sign-up Route
-app.post('/signup', (req, res) => {
+//Nashville - this is still left - RUN THIS FROM NODE SERVER>JS in TERMINAL
+//fetchAndStorePlacesForCategoryNashville('catering.restaurant');  
+//fetchAndStorePlacesForCategoryNashville('accommodation.hotel'); 
+//fetchAndStorePlacesForCategoryNashville('entertainment.bowling_alley');
+//fetchAndStorePlacesForCategoryNashville('entertainment.aquarium');
+//fetchAndStorePlacesForCategoryNashville('entertainment.zoo');
+//fetchAndStorePlacesForCategoryNashville('entertainment.museum');
+//fetchAndStorePlacesForCategoryNashville('entertainment.escape_game');
+//fetchAndStorePlacesForCategoryNashville('entertainment.miniature_golf');
+//fetchAndStorePlacesForCategoryNashville('entertainment.theme_park');
+//fetchAndStorePlacesForCategoryNashville('entertainment.water_park');
+//fetchAndStorePlacesForCategoryNashville('healthcare.clinic_or_praxis');
+//fetchAndStorePlacesForCategoryNashville('healthcare.hospital');
+
+
+
+// API endpoint for user signup
+app.post('/signup', async (req, res) => {
     const { username, firstName, lastName, email, password } = req.body;
-
-    // Hash the password
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).send('Error hashing password');
+    try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).send('User already exists');
         }
-
-        // Save the user in the database with the hashed password
-        const newUser = new User({
-            username,
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword, // Store the hashed password
-        });
-
-        newUser.save((err) => {
-            if (err) {
-                console.error('Error saving user:', err);
-                return res.status(500).send('Error saving user');
-            }
-            res.status(200).send('User registered successfully');
-        });
-    });
+        const newUser = new User({ username, firstName, lastName, email, password });
+        await newUser.save(); // Save user to the database
+        res.status(201).send('User created successfully');
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).send('Error creating user');
+    }
 });
 
-// Login Route
-app.post('/login', (req, res) => {
+//login endpoint
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
-    // Find the user by username
-    User.findOne({ username }, (err, user) => {
-        if (err) {
-            console.error('Error fetching user:', err);
-            return res.status(500).send('Internal server error');
+    try {
+        const user = await User.findOne({ username });
+        if (!user || password !== user.password) {
+            return res.status(400).send('Invalid username or password');
         }
-        if (!user) {
-            return res.status(400).send('User not found');
-        }
-
-        // Compare the entered password with the hashed password in the database
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) {
-                console.error('Error comparing passwords:', err);
-                return res.status(500).send('Error comparing passwords');
-            }
-
-            if (isMatch) {
-                // Passwords match, proceed with login (e.g., create a session, send a token)
-                res.status(200).send('Login successful');
-            } else {
-                // Passwords do not match
-                res.status(400).send('Invalid password');
-            }
+        req.login(user, (err) => {
+            if (err) return res.status(500).send('Login error');
+            return res.status(200).send('Login successful');
         });
-    });
-})
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).send('Error during login');
+    }
+});
 
 //function to fetch data from the external API
 async function fetchPlaceDataFromAPI(placeId) {
@@ -488,32 +933,6 @@ app.post('/rate', isAuthenticated, async (req, res) => {
 });
 
 
-// Memphis-specific rating submission route
-app.post('/rate/memphis/:placeId', async (req, res) => {
-    const { placeId } = req.params;
-    const { rating } = req.body;
-
-    console.log("Rating submission for Memphis placeId:", placeId);  // Log to check
-
-    try {
-        // Find the place in the Memphis database
-        const place = await MemphisPlace.findOne({ placeId });
-
-        if (!place) {
-            return res.status(404).json({ message: 'Place not found' });
-        }
-
-        // Add the rating to the ratings array
-        place.ratings.push({ rating });
-
-        await place.save();
-        res.status(200).json({ message: 'Rating submitted successfully!' });
-
-    } catch (error) {
-        console.error('Error submitting rating:', error);
-        res.status(500).json({ message: 'Error submitting rating' });
-    }
-});
 
 // Chattanooga-specific rating submission route
 app.post('/rate/chattanooga/:placeId', async (req, res) => {
@@ -543,25 +962,88 @@ app.post('/rate/chattanooga/:placeId', async (req, res) => {
     }
 });
 
-// Memphis comment submission route
-app.post('/comment/memphis/:placeId', async (req, res) => {
+// Memphis-specific rating submission route
+app.post('/rate/memphis/:placeId', async (req, res) => {
     const { placeId } = req.params;
-    const { text } = req.body;
+    const { rating } = req.body;
+
+    console.log("Rating submission for Memphis placeId:", placeId);  // Log to check
 
     try {
+        // Find the place in the Memphis database
         const place = await MemphisPlace.findOne({ placeId });
 
         if (!place) {
             return res.status(404).json({ message: 'Place not found' });
         }
 
-        place.comments.push({ text });
+        // Add the rating to the ratings array
+        place.ratings.push({ rating });
+
         await place.save();
-        res.status(200).json({ message: 'Comment submitted successfully!' });
+        res.status(200).json({ message: 'Rating submitted successfully!' });
+
     } catch (error) {
-        res.status(500).json({ message: 'Error submitting comment' });
+        console.error('Error submitting rating:', error);
+        res.status(500).json({ message: 'Error submitting rating' });
     }
 });
+
+// Knoxville-specific rating submission route
+app.post('/rate/knoxville/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { rating } = req.body;
+
+    console.log("Rating submission for Knoxville placeId:", placeId);  // Log to check
+
+    try {
+        // Find the place in the Memphis database
+        const place = await KnoxvillePlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        // Add the rating to the ratings array
+        place.ratings.push({ rating });
+
+        await place.save();
+        res.status(200).json({ message: 'Rating submitted successfully!' });
+
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        res.status(500).json({ message: 'Error submitting rating' });
+    }
+});
+
+// Nashville-specific rating submission route
+app.post('/rate/nashville/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { rating } = req.body;
+
+    console.log("Rating submission for Nashville placeId:", placeId);  // Log to check
+
+    try {
+        // Find the place in the Nashville database
+        const place = await NashvillePlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        // Add the rating to the ratings array
+        place.ratings.push({ rating });
+
+        await place.save();
+        res.status(200).json({ message: 'Rating submitted successfully!' });
+
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        res.status(500).json({ message: 'Error submitting rating' });
+    }
+});
+
+
 
 // Chattanooga comment submission route
 app.post('/comment/chattanooga/:placeId', async (req, res) => {
@@ -583,7 +1065,65 @@ app.post('/comment/chattanooga/:placeId', async (req, res) => {
     }
 });
 
+// Memphis comment submission route
+app.post('/comment/memphis/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
 
+    try {
+        const place = await MemphisPlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.comments.push({ text });
+        await place.save();
+        res.status(200).json({ message: 'Comment submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting comment' });
+    }
+});
+
+// Knoxville comment submission route
+app.post('/comment/knoxville/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
+
+    try {
+        const place = await KnoxvillePlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.comments.push({ text });
+        await place.save();
+        res.status(200).json({ message: 'Comment submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting comment' });
+    }
+});
+
+// Nashville comment submission route
+app.post('/comment/nashville/:placeId', async (req, res) => {
+    const { placeId } = req.params;
+    const { text } = req.body;
+
+    try {
+        const place = await NashvillePlace.findOne({ placeId });
+
+        if (!place) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        place.comments.push({ text });
+        await place.save();
+        res.status(200).json({ message: 'Comment submitted successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting comment' });
+    }
+});
 
 // start the server :D
 app.listen(PORT, () => {
