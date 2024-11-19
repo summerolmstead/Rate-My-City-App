@@ -237,7 +237,7 @@
                             // Dynamically decide which route to hit based on the city (Chattanooga or Memphis)
                             const city = place.city.toLowerCase(); // Assuming `place.city` holds the city name like "Chattanooga" or "Memphis"
     
-                            const response = await fetch(`/rate/${city}/${placeId}`, {
+                            const response = await fetch(`/rate/nashville/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -262,7 +262,7 @@
     
                             const city = place.city.toLowerCase();  // Dynamically decide which route to hit based on the city
     
-                            const response = await fetch(`/comment/${city}/${placeId}`, {
+                            const response = await fetch(`/comment/nashville/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
