@@ -156,17 +156,17 @@
     <script>
         const placeList = document.getElementById('place-list');
     
-        // Function to load entertainment places based on category
-        async function loadEntertainment(category) {
-            placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
+    // Function to load entertainment places based on category
+    async function loadEntertainment(category) {
+        placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
+
+        try {
+            const response = await fetch(`/nashvilleentertainment/${category}`);
+            const places = await response.json();
+
+            placeList.innerHTML = '';  // Clear loading message
     
-            try {
-                const response = await fetch(`/nashvilleentertainment/${category}`);
-                const places = await response.json();
-    
-                placeList.innerHTML = '';  // Clear loading message
-    
-                if (places.length > 0) {
+            if (places.length > 0) {
                     places.forEach((place) => {
                         const name = place.name || 'Name not available';
                         const streetAddress = place.address || 'Street address not available';

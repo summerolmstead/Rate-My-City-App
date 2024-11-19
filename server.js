@@ -279,14 +279,14 @@ app.get('/memphisentertainment/:category', async (req, res) => {
   
       //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
       const validCategories = [
-        'memphisentertainment.bowling_alley', 
-        'memphisentertainment.aquarium',
-        'memphisentertainment.zoo',
-        'memphisentertainment.museum',
-        'memphisentertainment.escape_game',
-        'memphisentertainment.miniature_golf',
-        'memphisentertainment.theme_park',
-        'memphisentertainment.water_park'
+        'entertainment.bowling_alley', 
+        'entertainment.aquarium',
+        'entertainment.zoo',
+        'entertainment.museum',
+        'entertainment.escape_game',
+        'entertainment.miniature_golf',
+        'entertainment.theme_park',
+        'entertainment.water_park'
       ];
   
       if (!validCategories.includes(category)) {
@@ -315,14 +315,14 @@ app.get('/knoxvilleentertainment/:category', async (req, res) => {
   
       //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
       const validCategories = [
-        'knoxvilleentertainment.bowling_alley', 
-        'knoxvilleentertainment.aquarium',
-        'knoxvilleentertainment.zoo',
-        'knoxvilleentertainment.museum',
-        'knoxvilleentertainment.escape_game',
-        'knoxvilleentertainment.miniature_golf',
-        'knoxvilleentertainment.theme_park',
-        'knoxvilleentertainment.water_park'
+        'entertainment.bowling_alley', 
+        'entertainment.aquarium',
+        'entertainment.zoo',
+        'entertainment.museum',
+        'entertainment.escape_game',
+        'entertainment.miniature_golf',
+        'entertainment.theme_park',
+        'entertainment.water_park'
       ];
   
       if (!validCategories.includes(category)) {
@@ -350,14 +350,14 @@ app.get('/nashvilleentertainment/:category', async (req, res) => {
   
       //categories to check from api : bowling_alley, aquarium, zoo, museum, escape_game, miniature_golf, theme_park, water_park
       const validCategories = [
-        'nashvilleentertainment.bowling_alley', 
-        'nashvilleentertainment.aquarium',
-        'nashvilleentertainment.zoo',
-        'nashvilleentertainment.museum',
-        'nashvilleentertainment.escape_game',
-        'nashvilleentertainment.miniature_golf',
-        'nashvilleentertainment.theme_park',
-        'nashvilleentertainment.water_park'
+        'entertainment.bowling_alley', 
+        'entertainment.aquarium',
+        'entertainment.zoo',
+        'entertainment.museum',
+        'entertainment.escape_game',
+        'entertainment.miniature_golf',
+        'entertainment.theme_park',
+        'entertainment.water_park'
       ];
   
       if (!validCategories.includes(category)) {
@@ -377,7 +377,6 @@ app.get('/nashvilleentertainment/:category', async (req, res) => {
       res.status(500).json({ message: 'Error fetching entertainment places.' });
     }
   });
-  
 
 // Healthcare route - Chattanooga
 app.get('/healthcare/:category', async (req, res) => {
@@ -1024,7 +1023,7 @@ app.post('/rate/nashville/:placeId', async (req, res) => {
     console.log("Rating submission for Nashville placeId:", placeId);  // Log to check
 
     try {
-        // Find the place in the knox database
+        // Find the place in the Memphis database
         const place = await NashvillePlace.findOne({ placeId });
 
         if (!place) {
