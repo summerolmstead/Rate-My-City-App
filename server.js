@@ -425,7 +425,7 @@ app.get('/memphishealthcare/:category', async (req, res) => {
         }
   
         // Fetch places based on category
-        const places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
+        const places = await MemphisPlace.find({ category }).populate('comments');  // Populate comments if they exist
   
         if (places.length > 0) {
             res.json(places);  // Send the places as JSON
@@ -437,6 +437,7 @@ app.get('/memphishealthcare/:category', async (req, res) => {
         res.status(500).json({ message: 'Error fetching healthcare places.' });
     }
 });
+
 
 // Healthcare route - Knoxville
 app.get('/knoxvillehealthcare/:category', async (req, res) => {
