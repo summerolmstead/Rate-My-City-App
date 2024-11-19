@@ -425,17 +425,17 @@ app.get('/memphishealthcare/:category', async (req, res) => {
             return res.status(400).json({ message: 'Invalid category' });
         }
   
-        // Fetch places based on category and city (Memphis)
-        const places = await MemphisPlace.find({ category, city: 'Memphis' }).populate('comments');  // Populate comments if they exist
+        // Fetch places based on category
+        const places = await Place.find({ category }).populate('comments');  // Populate comments if they exist
   
         if (places.length > 0) {
             res.json(places);  // Send the places as JSON
         } else {
-            res.status(404).json({ message: 'No healthcare places found in Memphis.' });
+            res.status(404).json({ message: 'No healthcare places found.' });
         }
     } catch (error) {
-        console.error('Error fetching healthcare places in Memphis:', error);
-        res.status(500).json({ message: 'Error fetching healthcare places in Memphis.' });
+        console.error('Error fetching healthcare places:', error);
+        res.status(500).json({ message: 'Error fetching healthcare places.' });
     }
 });
 
@@ -756,7 +756,7 @@ async function fetchAndStorePlacesForCategoryNashville(category) {
                     placeId: place.place_id,
                     name: place.name || "Unknown Name",
                     address: place.address_line1 || "Unknown Address",
-                    city: place.city || "Unknown City",
+                    city: "Nashville" || "Unknown City",
                     phone: place.phone || "Unknown Phone",
                     website: place.website || "Unknown Website",
                     category: category,  //the category to store in db so it doesnt get confused with other in table!!!

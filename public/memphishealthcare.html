@@ -135,8 +135,8 @@
     <main id="healthcare-main">
         <h2>Explore Healthcare in Memphis</h2>
 
-        <!-- Category buttons for 'Clinics' and 'Hospitals' -->
-        <div id="category-buttons">
+         <!-- Category buttons for 'Clinics' and 'Hospitals' -->
+         <div id="category-buttons">
             <button class="category-button" onclick="loadHealthcare('healthcare.clinic_or_praxis')">Clinics</button>
             <button class="category-button" onclick="loadHealthcare('healthcare.hospital')">Hospitals</button>
         </div>
@@ -155,7 +155,6 @@
 
     
         async function loadHealthcare() {
-
             if (isLoading) return;  // Prevent duplicate requests while one is still loading
             isLoading = true;  // Set loading flag to true
     
@@ -234,7 +233,7 @@
                             event.preventDefault();
                             const rating = event.target.rating.value;
     
-                            const response = await fetch(`/rate/memphis/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
+                            const response = await fetch(`/rate/memphis/${placeId}`, {  // Ensure to use 'memphis' in the URL
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
