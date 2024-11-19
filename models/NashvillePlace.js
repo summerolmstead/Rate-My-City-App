@@ -4,7 +4,7 @@ const NashvillePlaceSchema = new mongoose.Schema({
     placeId: String,
     name: String,
     address: String,
-    city: "Nashville",
+    city: String,
     phone: String,
     website: String,
     ratings: [

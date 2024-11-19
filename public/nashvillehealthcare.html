@@ -177,7 +177,7 @@
                     places.forEach((place) => {
                         const name = place.name || 'Name not available';
                         const streetAddress = place.address || 'Street address not available';
-                        const city = "Nashville" || 'City not available';
+                        const city = place.city || 'City not available';
                         const phone = place.phone || 'Phone number not available';
                         const website = place.website || 'Website not available';
                         const placeId = place.placeId;
@@ -232,7 +232,7 @@
                             event.preventDefault();
                             const rating = event.target.rating.value;
     
-                            const response = await fetch(`/rate/chattanooga/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
+                            const response = await fetch(`/rate/nashville/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

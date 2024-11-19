@@ -154,7 +154,7 @@
                                 return;
                             }
     
-                            const response = await fetch(`/rate/memphis/${placeId}`, {
+                            const response = await fetch(`/rate/nashville/${placeId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -178,7 +178,7 @@
                             const city = place.city.toLowerCase();  // Dynamically get the city
                             console.log("City for comment:", city);  // Log to ensure city is correct
     
-                            const response = await fetch(`/comment/${city}/${placeId}`, {  // Include the city in the route
+                            const response = await fetch(`/comment/nashville/${placeId}`, {  // Update the route to include 'chattanooga'
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
