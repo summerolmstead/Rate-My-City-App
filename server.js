@@ -416,8 +416,8 @@ app.get('/memphishealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'memphishealthcare.hospital', 
-            'memphishealthcare.clinic_or_praxis' 
+            'healthcare.hospital', 
+            'healthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -446,8 +446,8 @@ app.get('/knoxvillehealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'knoxvillehealthcare.hospital', 
-            'knoxvillehealthcare.clinic_or_praxis' 
+            'healthcare.hospital', 
+            'healthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -477,8 +477,8 @@ app.get('/nashvillehealthcare/:category', async (req, res) => {
   
         // Categories to check from the API
         const validCategories = [
-            'nashvillehealthcare.hospital', 
-            'nashvillehealthcare.clinic_or_praxis' 
+            'healthcare.hospital', 
+            'healthcare.clinic_or_praxis' 
         ];
   
         // Check if the provided category is valid
@@ -997,7 +997,7 @@ app.post('/rate/knoxville/:placeId', async (req, res) => {
     console.log("Rating submission for Knoxville placeId:", placeId);  // Log to check
 
     try {
-        // Find the place in the Memphis database
+        // Find the place in the knox database
         const place = await KnoxvillePlace.findOne({ placeId });
 
         if (!place) {
@@ -1024,7 +1024,7 @@ app.post('/rate/nashville/:placeId', async (req, res) => {
     console.log("Rating submission for Nashville placeId:", placeId);  // Log to check
 
     try {
-        // Find the place in the Nashville database
+        // Find the place in the knox database
         const place = await NashvillePlace.findOne({ placeId });
 
         if (!place) {
@@ -1042,7 +1042,6 @@ app.post('/rate/nashville/:placeId', async (req, res) => {
         res.status(500).json({ message: 'Error submitting rating' });
     }
 });
-
 
 
 // Chattanooga comment submission route
@@ -1124,6 +1123,7 @@ app.post('/comment/nashville/:placeId', async (req, res) => {
         res.status(500).json({ message: 'Error submitting comment' });
     }
 });
+
 
 // start the server :D
 app.listen(PORT, () => {
