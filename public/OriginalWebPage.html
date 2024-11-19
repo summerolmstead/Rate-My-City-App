@@ -6,6 +6,7 @@
     <title>Rate Your City</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lora:wght@400&display=swap" rel="stylesheet">
     <style>
+        /* Main Page Styles */
         body {
             background-color: #d3e1c7;
             background-image: url('chattanooga_sketch.png');
@@ -14,34 +15,46 @@
             background-repeat: no-repeat;
             color: #333;
             margin: 0;
-            height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             font-family: 'Poppins', sans-serif;
         }
 
         .banner {
             width: 100%;
             background-color: rgba(125, 159, 109, 0.8);
-            padding: 10px 20px;
+            padding: 10px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
+        .banner .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
         .banner h1 {
             font-family: 'Lora', serif;
             font-size: 28px;
             color: #ffffff;
-            margin: 0;
+            margin-left: 10px;
+        }
+
+        .banner img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
         }
 
         .search-container {
             display: flex;
             align-items: center;
+            justify-content: center;
+            flex-grow: 1;
         }
 
         .search-container input {
@@ -69,6 +82,11 @@
             color: #ffffff;
         }
 
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
         .auth-buttons button {
             padding: 8px 12px;
             background-color: #ffffff;
@@ -76,7 +94,6 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-left: 10px;
             font-weight: 600;
             transition: background-color 0.3s;
         }
@@ -111,46 +128,64 @@
             margin: 20px 0;
         }
 
-        .footer {
-            background-color: rgba(211, 225, 199, 0.8);
-            width: 100%;
+        /* Meet the Creators Section */
+        .creators {
+    background-image: url('utcpic7.jpg');
+    background-size: cover;
+    background-position: center;
+    color: black;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 150px; /* Added margin to add more space above */
+}
+
+
+        .creators .content {
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 20px;
-            text-align: center;
-            margin-top: auto;
-            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            max-width: 800px;
+            margin: auto;
         }
 
-        .footer button {
-            padding: 10px;
-            background-color: #7d9f6d;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s;
+        .person {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
         }
 
-        .footer button:hover {
-            background-color: #6f8a56;
+        .person img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
         }
 
+        .person-info {
+            margin-left: 20px;
+            text-align: left;
+        }
+
+        .person-info h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .person-info p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
-
+    <!-- Banner Section -->
     <div class="banner">
-        <h1>Rate Your City</h1>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="Logo">
+            <h1>Rate Your City</h1>
+        </div>
         <div class="search-container">
             <input list="cities" id="cityInput" placeholder="Select or search for a city...">
             <datalist id="cities">
                 <option value="Chattanooga">
-                <option value="Memphis"> <!--summer adding for test-->
-                <option value="Knoxville">
-                <option value="Nashville">
-
-
-                </option>
             </datalist>
             <button onclick="searchCity()">Search</button>
         </div>
@@ -160,17 +195,64 @@
         </div>
     </div>
 
+    <!-- Content Section -->
     <div class="content">
         <h2>Welcome to Rate Your City!</h2>
         <p>This is the app that allows you to see the ranking of popular restaurants, grocery stores, events, and entertainment spots here in Chattanooga.</p>
         <p>This is currently the demo version. We are only offering Chattanooga, TN at the moment, and we hope to implement other nearby cities in the future.</p>
-        
-        <!-- Inserted Image -->
         <img src="chattanooga-outline-solid-black.png" alt="Chattanooga City Outline">
     </div>
 
-    <div class="footer">
-        <button onclick="location.href='MeetTheCreators.html'">Meet the Creators</button>
+    <!-- Meet the Creators Section -->
+    <div class="creators">
+        <div class="content">
+            <h1>Meet the Creators</h1>
+
+            <div class="person">
+                <img src="summerolmstead.jpg" alt="Summer Olmstead">
+                <div class="person-info">
+                    <h1>Summer Olmstead</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Data Science with a minor in Economics from Nashville, TN.</p>
+                    <p>Her passions include coding, hiking, and baking. <3</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="wyattgaines.jpg" alt="Wyatt Gaines">
+                <div class="person-info">
+                    <h1>Wyatt Gaines</h1>
+                    <p>I'm a current undergraduate senior at UTC majoring in Computer Science with a concentration in Data Science.</p>
+                    <p>I'm originally from Pulaski, TN. Some fun facts about me are I like to travel, read, code :), and binge-watch anything and everything on Netflix.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="kyle.jpg" alt="Kyle">
+                <div class="person-info">
+                    <h1>Kyle</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Cyber Security with a minor in Psychology.</p>
+                    <p>From Jackson, TN. His passions include playing golf, sports, gaming, and traveling.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="nandnipatel.jpg" alt="Nandni Patel">
+                <div class="person-info">
+                    <h1>Nandni Patel</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Software Systems from Rossville, GA.</p>
+                    <p>Her passions include spending time with family/friends, traveling, and cooking.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="Prisha.jpeg" alt="Prisha">
+                <div class="person-info">
+                    <h1>Prisha</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Software Systems originally from Orlando, FL.</p>
+                    <p>In her free time, she loves hiking, kayaking, and hanging out with family and friends!</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -178,25 +260,10 @@
             var cityInput = document.getElementById('cityInput').value;
             if (cityInput.toLowerCase() === 'chattanooga') {
                 window.location.href = 'chattanooga.html';
-            } 
-            else if(cityInput.toLowerCase() === 'memphis')
-            {
-                window.location.href = "memphis.html"; //summer adding memphis to test if works w/ general logic
-            }
-            else if(cityInput.toLowerCase() === 'knoxville')
-            {
-                window.location.href = "knoxville.html"; //adding knoxville
-            }
-            else if(cityInput.toLowerCase() === 'nashville')
-            {
-                window.location.href = "nashville.html"; //adding knoxville
-            }
-            else 
-            {
+            } else {
                 alert('Choose or type a city.');
             }
         }
     </script>
-
 </body>
 </html>
