@@ -149,12 +149,11 @@
     
     <script>
         const placeList = document.getElementById('place-list');
-
+    
         // Add a flag to track if the request is currently in progress
         let isLoading = false;
-
     
-        async function loadHealthcare() {
+        async function loadHealthcare(category) {
             if (isLoading) return;  // Prevent duplicate requests while one is still loading
             isLoading = true;  // Set loading flag to true
     
@@ -233,7 +232,7 @@
                             event.preventDefault();
                             const rating = event.target.rating.value;
     
-                            const response = await fetch(`/rate/memphis/${placeId}`, {  // Ensure to use 'memphis' in the URL
+                            const response = await fetch(`/rate/memphis/${placeId}`, {  // Ensure to use 'chattanooga' in the URL
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
