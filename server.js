@@ -20,7 +20,6 @@ const NashvillePlace = require('./models/NashvillePlace');
 
 const app = express();
 const PORT = process.env.PORT || 3307;
-
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
@@ -28,7 +27,6 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true }
 });
-
 
 module.exports = User;
 
@@ -854,7 +852,7 @@ app.post('/signup', async (req, res) => {
     const { username, firstName, lastName, email, password } = req.body;
 
     try {
-        // Check if the username or email already exists
+        // check if the username or email already exists
         const existingUser = await User.findOne({
             $or: [{ username }, { email }]
         });
@@ -862,20 +860,20 @@ app.post('/signup', async (req, res) => {
             return res.status(400).send('Username or email already in use.');
         }
 
-        // Hash the password
+        // hash the password
         const saltRounds = 10; // Adjust as necessary for your security requirements
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Create and save the new user
+        // create and save the new user
         const newUser = new User({
             username,
             firstName,
             lastName,
             email,
-            password: hashedPassword // Store the hashed password
+            password: hashedPassword // store the hashed password
         });
 
-        await newUser.save(); // Save the new user in the database
+        await newUser.save(); // save the new user in the database
 
         res.status(201).send('User created successfully');
     } catch (error) {
@@ -890,19 +888,19 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Find user by username
+        // find user by username
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(404).send('Invalid username or password');
         }
 
-        // Compare passwords using bcrypt
+        // compare passwords using bcrypt
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).send('Invalid username or password');
         }
 
-        // If passwords match, log the user in
+        //  passwords match, log the user in
         req.login(user, (err) => {
             if (err) {
                 console.error('Error during login:', err);

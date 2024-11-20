@@ -101,14 +101,14 @@
                 body: JSON.stringify({ username, password })
             });
 
-            // Debug: Check the response status and content
-            const responseText = await response.text(); // Get the response body as text
+            // checking for the response status and content
+            const responseText = await response.text(); // get the response
             console.log('Server Response:', response.status, responseText);
 
             // Handle success or failure
             if (response.ok) {
                 alert('Login successful');
-                window.location.href = 'personaluser.html'; // Redirect to personal user page
+                window.location.href = 'personaluser.html';
             } else {
                 alert('Invalid username or password. Please try again.');
             }
@@ -118,7 +118,7 @@
         }
     });
 
-    // Redirect to the home page
+    // connected to the main menu button
     function homePage() {
         window.location.href = 'OriginalWebPage.html';
     }
