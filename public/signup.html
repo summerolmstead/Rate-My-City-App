@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Giga&display=swap" rel="stylesheet">
     <title>Sign Up</title>
-    <!--- same style following usual-->
+    <!--- signup style-->
     <style>
         body {
             font-family: 'Lexend Giga', sans-serif;
@@ -97,7 +97,7 @@
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // Check the values for debugging
+    // debugging
     console.log(username, firstName, lastName, email, password);
 
     const response = await fetch('/signup', {
@@ -108,7 +108,7 @@
         body: JSON.stringify({ username, firstName, lastName, email, password })
     });
 
-    // If signup was successful
+    // if our sign up is successful
     if (response.ok) {
         localStorage.setItem('firstName', firstName);
         alert('Sign up successful!');
@@ -119,7 +119,7 @@
 });
 
 
-        // Redirect to home page
+        // connected to the main menu button
         function homePage() {
             window.location.href = 'OriginalWebPage.html';
         }
