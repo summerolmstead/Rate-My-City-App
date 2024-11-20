@@ -86,11 +86,13 @@
     </form>
     <!-- logic with database -->
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
 
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -98,18 +100,28 @@
                 },
                 body: JSON.stringify({ username, password })
             });
-            // redirects only if gets the correct alert notified
+
+            // Debug: Check the response status and content
+            const responseText = await response.text(); // Get the response body as text
+            console.log('Server Response:', response.status, responseText);
+
+            // Handle success or failure
             if (response.ok) {
                 alert('Login successful');
-                window.location.href = 'personaluser.html'; // redirect to personal user page
+                window.location.href = 'personaluser.html'; // Redirect to personal user page
             } else {
-                alert('Invalid username or password. Please try again.'); // scenario doesnt work
+                alert('Invalid username or password. Please try again.');
             }
-        });
-        // go home function
-        function homePage() {
-            window.location.href = 'OriginalWebPage.html';
+        } catch (error) {
+            console.error('Error during login:', error);
+            alert('An error occurred. Please try again later.');
         }
+    });
+
+    // Redirect to the home page
+    function homePage() {
+        window.location.href = 'OriginalWebPage.html';
+    }
     </script>
 </body>
 </html>

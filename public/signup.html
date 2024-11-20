@@ -90,30 +90,36 @@
     <!-- fields to pass to database-->
     <script>
         document.getElementById('signupForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    event.preventDefault(); // Prevent form submission from reloading the page
+    const username = document.getElementById('username').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-            const response = await fetch('/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, firstName, lastName, email, password })
-            });
-            // if sign up to database was successful or not
-            if (response.ok) {
-                localStorage.setItem('firstName', firstName);
-                alert('Sign up successful!');
-                window.location.href = 'login.html'; //redirect to the login page
-            } else {
-                alert('Error signing up. Please try again.');
-            }
-        });
-        // Home Page function
+    // Check the values for debugging
+    console.log(username, firstName, lastName, email, password);
+
+    const response = await fetch('/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, firstName, lastName, email, password })
+    });
+
+    // If signup was successful
+    if (response.ok) {
+        localStorage.setItem('firstName', firstName);
+        alert('Sign up successful!');
+        window.location.href = 'login.html'; // Redirect to login page
+    } else {
+        alert('Error signing up. Please try again.');
+    }
+});
+
+
+        // Redirect to home page
         function homePage() {
             window.location.href = 'OriginalWebPage.html';
         }

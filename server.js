@@ -8,6 +8,7 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const fetch = require('node-fetch');  // This works fine with v2.x must install - Summer
+const bcrypt = require('bcrypt');
 
 //import the already defined models in /models where all db tables defined
 const Place = require('./models/Place');  // Already defined in models/Place.js
@@ -19,6 +20,17 @@ const NashvillePlace = require('./models/NashvillePlace');
 
 const app = express();
 const PORT = process.env.PORT || 3307;
+
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true }
+});
+
+
+module.exports = User;
 
 //middleware setup
 app.use(bodyParser.json());
@@ -838,40 +850,72 @@ async function fetchAndStorePlacesForCategoryNashville(category) {
 
 
 
-// API endpoint for user signup
 app.post('/signup', async (req, res) => {
     const { username, firstName, lastName, email, password } = req.body;
+
     try {
-        const existingUser = await User.findOne({ username });
+        // Check if the username or email already exists
+        const existingUser = await User.findOne({
+            $or: [{ username }, { email }]
+        });
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).send('Username or email already in use.');
         }
-        const newUser = new User({ username, firstName, lastName, email, password });
-        await newUser.save(); // Save user to the database
+
+        // Hash the password
+        const saltRounds = 10; // Adjust as necessary for your security requirements
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Create and save the new user
+        const newUser = new User({
+            username,
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword // Store the hashed password
+        });
+
+        await newUser.save(); // Save the new user in the database
+
         res.status(201).send('User created successfully');
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).send('Error creating user');
+        res.status(500).send('An internal server error occurred. Please try again later.');
     }
 });
 
 //login endpoint
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+
     try {
+        // Find user by username
         const user = await User.findOne({ username });
-        if (!user || password !== user.password) {
-            return res.status(400).send('Invalid username or password');
+        if (!user) {
+            return res.status(404).send('Invalid username or password');
         }
+
+        // Compare passwords using bcrypt
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).send('Invalid username or password');
+        }
+
+        // If passwords match, log the user in
         req.login(user, (err) => {
-            if (err) return res.status(500).send('Login error');
-            return res.status(200).send('Login successful');
+            if (err) {
+                console.error('Error during login:', err);
+                return res.status(500).send('Login failed');
+            }
+            res.status(200).send('Login successful');
         });
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).send('Error during login');
+    } catch (err) {
+        console.error('Error during login:', err);
+        res.status(500).send('An error occurred');
     }
 });
+
 
 //function to fetch data from the external API
 async function fetchPlaceDataFromAPI(placeId) {
