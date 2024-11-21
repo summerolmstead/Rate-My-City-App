@@ -188,27 +188,26 @@
                 alert('Choose or type a city.');
             }
     }
-   document.addEventListener('DOMContentLoaded', async () => {
-    // Clear the firstName from localStorage if you just logged in or after signup
-    localStorage.removeItem('firstName');
-
-    // Check if firstName is already stored in localStorage
+    document.addEventListener('DOMContentLoaded', async () => {
+    // Clear the firstName from localStorage if it belongs to another session
     const storedName = localStorage.getItem('firstName');
     if (storedName) {
-        // If the name is in localStorage, display it
+        // Show the stored name in the banner
         document.getElementById('user-name').innerText = storedName;
     } else {
-        // If no name in localStorage, fetch it from the backend
+        // Fetch the name from the backend if not found in localStorage
         try {
-            const response = await fetch('/personaluser', { cache: "no-store" });
+            const response = await fetch('/personaluser', { cache: 'no-store' });
             if (response.ok) {
                 const user = await response.json();
-                // Display the first name
-                document.getElementById('user-name').innerText = user.firstName;
-                // Store the first name in localStorage for future use
-                localStorage.setItem('firstName', user.firstName);
+                if (user && user.firstName) {
+                    document.getElementById('user-name').innerText = user.firstName;
+                    localStorage.setItem('firstName', user.firstName); // Cache the name
+                } else {
+                    console.error('No firstName in the response');
+                }
             } else {
-                console.error('Error: Unable to fetch user data.');
+                console.error('Failed to fetch user info:', response.status);
             }
         } catch (error) {
             console.error('Error fetching user data:', error);

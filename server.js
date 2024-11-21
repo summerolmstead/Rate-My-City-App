@@ -914,6 +914,26 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/personaluser', async (req, res) => {
+    try {
+        // Assuming you have a session or token-based authentication
+        const username = req.session.username || req.headers.username; // Adjust based on your setup
+        if (!username) {
+            return res.status(401).json({ error: 'User not logged in' });
+        }
+
+        const user = await User.findOne({ username }); // Replace with your database logic
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ firstName: user.firstName }); // Send back the firstName
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 //function to fetch data from the external API
 async function fetchPlaceDataFromAPI(placeId) {
