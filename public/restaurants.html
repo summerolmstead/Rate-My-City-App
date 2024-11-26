@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
+
+.heart {
+    font-size: 24px;
+    cursor: pointer;
+    color: rgba(red, green, blue, alpha);
+    transition: color 0.3s;
+}
+.heart.favorited {
+    color: red;
+}
+
     /* Container for the stars */
 .stars {
     display: flex;
@@ -68,7 +79,7 @@
 
     <script>
         const placeList = document.getElementById('place-list');
-    
+
         // Function to fetch restaurants from the server
         async function loadRestaurants() {
             try {
@@ -94,6 +105,10 @@
                         item.classList.add('place-item');
                         item.innerHTML = `
                             <h3>${name}</h3>
+                            <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}" 
+                                onclick="toggleFavorite('${placeId}', '${place.name || 'Restaurant'}')">
+                                ${favorites.has(placeId) ? '♥' : '♡'}
+                            </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
                             <p><strong>City:</strong> ${city}</p>
                             <p><strong>Phone:</strong> ${phone}</p>
@@ -118,6 +133,7 @@
                                 <textarea name="comment" placeholder="Your comment here..." required></textarea>
                                 <button type="submit">Submit Comment</button>
                             </form>
+
                         `;
                         placeList.appendChild(item);
     
@@ -203,6 +219,58 @@
                 placeList.innerHTML = '<p>Error loading restaurants.</p>';
             }
         }
+
+        let favorites = new Set();
+
+        if(localStorage.getItem('favorites')) {
+            favorites = new Set(JSON.parse(localStorage.getItem('favorites')));
+        }
+        function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify([...favorites]));
+        }
+
+        function toggleFavorite(placeId, name) {
+            const favoriteButton = document.getElementById(`favorite-${placeId}`);
+            const isFavorited = favorites.has(placeId);
+
+            if (isFavorited) {
+                favorites.delete(placeId);
+                favoriteButton.classList.remove('favorited');
+                favoriteButton.innerHTML = '♡';
+                alert('Favorite Removed');
+
+            } else {
+                favorites.add(placeId);
+                favoriteButton.classList.add('favorited');
+                favoriteButton.innerHTML = '♥';
+                alert('Favorite Added');
+            }
+            saveFavorites();
+            updateFavoritesOnServer();
+        }
+
+        async function updateFavoriteOnServer() {
+            try {
+                const response = await fetch('/update-favorites', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify([...favorites]),
+                });
+                if (!response.ok) {
+                    const errorData =await response.json();
+                    console.error('Error updating favorites:', errorData?.message || 'Unknown error');
+                    alert('Error syncing favorites with the server. Please try again.');
+                } else {
+                    console.log('Favorites successfully synced with the server.');
+                }
+            } catch (error) {
+                console.error('Newtork error updating favorites:', error);
+                alert('Newtork error syncing favorites. Please try again later.');
+            }
+        }
+
     
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
@@ -223,7 +291,7 @@
     
             return stars.join('');
         }
-    
+
         loadRestaurants();  // Initial call to load restaurants
     </script>
     
