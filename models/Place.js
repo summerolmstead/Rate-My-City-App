@@ -21,7 +21,8 @@ const PlaceSchema = new mongoose.Schema({
             createdAt: { type: Date, default: Date.now }
         }
     ],
-    category: String  // Add the category field here to store the category (e.g., "restaurant", "hotel")
+    category: String,  // Add the category field here to store the category (e.g., "restaurant", "hotel")
+    favoritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 module.exports = mongoose.model('Place', PlaceSchema);
