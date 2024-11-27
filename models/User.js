@@ -8,11 +8,22 @@ const userSchema = new mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    favorites: { type: [String], default: [] } // array of favorite items from website
+    favorites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Place', default: [] }], // array of favorite items from website
+    ceateAt: { type: Date, default: Date.now },
 });
 
 // Create the User model
-const User = mongoose.model('User', userSchema);
+userSchema.methods.addFavorite = async function (placeId) {
+    if (!this.favorite.some(favorite => favorite.toString() === placeId.toString())) {
+        this.favorites.push(placeId);
+        await this.save();
+    }
+};
+
+userSchema.methods.removeFavorite = async function (placeId) {
+    this.favorites = this.favorites.filter((favorite) => favorite.toString() !== placeId.toString());
+    await this.save();
+};
 
 // Export the User model correctly
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
