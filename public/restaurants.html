@@ -8,16 +8,6 @@
 </head>
 <style>
 
-.heart {
-    font-size: 24px;
-    cursor: pointer;
-    color: rgba(red, green, blue, alpha);
-    transition: color 0.3s;
-}
-.heart.favorited {
-    color: red;
-}
-
     /* Container for the stars */
 .stars {
     display: flex;
@@ -105,8 +95,9 @@
                         item.classList.add('place-item');
                         item.innerHTML = `
                             <h3>${name}</h3>
-                            <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}" 
-                                onclick="toggleFavorite('${placeId}', '${place.name || 'Restaurant'}')">
+                            <button id="favorite-${placeId}"
+                                class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
+                                onclick="handleFavorteAndRedirect('{placeId}', '${place.name || 'Restaurant'}', '/personaluser')">
                                 ${favorites.has(placeId) ? '♥' : '♡'}
                             </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
@@ -268,6 +259,30 @@
             } catch (error) {
                 console.error('Newtork error updating favorites:', error);
                 alert('Newtork error syncing favorites. Please try again later.');
+            }
+        }
+
+        async function handleFavoriteAndRedirect(placeId, placeName, redirectUrl) {
+            try {
+                const isFavorited = favorites.has(placeId);
+
+                const response = await fetch('/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ placeId }),
+                });
+
+                if (!response.ok) throw new Error('Failed to toggle favorite');
+                const data = await response.json();
+
+                if (isFavorited) {
+                    favorites.delete(placeId);
+                    alert(`Remove "${placeName}" to your favorites.`);
+                }
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error toggling favories:', error);
+                alert('Something went wrong. Please try agian.');
             }
         }
 
