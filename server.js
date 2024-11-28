@@ -8,6 +8,7 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const fetch = require('node-fetch');  // This works fine with v2.x must install - Summer
+const bcrypt = require('bcrypt');
 
 //import the already defined models in /models where all db tables defined
 const Place = require('./models/Place');  // Already defined in models/Place.js
@@ -19,6 +20,15 @@ const NashvillePlace = require('./models/NashvillePlace');
 
 const app = express();
 const PORT = process.env.PORT || 3307;
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true }
+});
+
+module.exports = User;
 
 //middleware setup
 app.use(bodyParser.json());
@@ -838,40 +848,92 @@ async function fetchAndStorePlacesForCategoryNashville(category) {
 
 
 
-// API endpoint for user signup
 app.post('/signup', async (req, res) => {
     const { username, firstName, lastName, email, password } = req.body;
+
     try {
-        const existingUser = await User.findOne({ username });
+        // check if the username or email already exists
+        const existingUser = await User.findOne({
+            $or: [{ username }, { email }]
+        });
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).send('Username or email already in use.');
         }
-        const newUser = new User({ username, firstName, lastName, email, password });
-        await newUser.save(); // Save user to the database
+
+        // hash the password
+        const saltRounds = 10; // Adjust as necessary for your security requirements
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // create and save the new user
+        const newUser = new User({
+            username,
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword // store the hashed password
+        });
+
+        await newUser.save(); // save the new user in the database
+
         res.status(201).send('User created successfully');
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).send('Error creating user');
+        res.status(500).send('An internal server error occurred. Please try again later.');
     }
 });
 
 //login endpoint
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+
     try {
+        // find user by username
         const user = await User.findOne({ username });
-        if (!user || password !== user.password) {
-            return res.status(400).send('Invalid username or password');
+        if (!user) {
+            return res.status(404).send('Invalid username or password');
         }
+
+        // compare passwords using bcrypt
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).send('Invalid username or password');
+        }
+
+        //  passwords match, log the user in
         req.login(user, (err) => {
-            if (err) return res.status(500).send('Login error');
-            return res.status(200).send('Login successful');
+            if (err) {
+                console.error('Error during login:', err);
+                return res.status(500).send('Login failed');
+            }
+            res.status(200).send('Login successful');
         });
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).send('Error during login');
+    } catch (err) {
+        console.error('Error during login:', err);
+        res.status(500).send('An error occurred');
     }
 });
+
+app.get('/personaluser', async (req, res) => {
+    try {
+        // Assuming you have a session or token-based authentication
+        const username = req.session.username || req.headers.username; // Adjust based on your setup
+        if (!username) {
+            return res.status(401).json({ error: 'User not logged in' });
+        }
+
+        const user = await User.findOne({ username }); // Replace with your database logic
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ firstName: user.firstName }); // Send back the firstName
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 //function to fetch data from the external API
 async function fetchPlaceDataFromAPI(placeId) {
@@ -1124,7 +1186,71 @@ app.post('/comment/nashville/:placeId', async (req, res) => {
     }
 });
 
+//Favorites
+app.post('/favorites', isAuthenticated, async (req, res) => {
+    const { placeId } = req.body;
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found'});
 
+        const place = await Place.findOne({ placeId });
+        if (!place) return res.status(404).json({ message: 'Place not found' });
+
+        const isFavorited = user.favorites.includes(placeId);
+        if (isFavorited) {
+            user.favorites = user.favorites.filter((fav) => fav.toString() !== placeId);
+            place.decrementFavoriteCount();
+        } else {
+            user.favorites.push(placeId);
+            place.incrementFavoriteCount();
+        }
+        await user.save();
+        await place.save();
+        
+        res.status(200).json({ favorites: user.favorites });
+
+    } catch (error) {
+        console.error('Error handling favorites:', error);
+        res.status(500).send('Error handling favorites');
+    }
+});
+
+app.get('/favorites', isAuthenticated, async (req, res) => {
+    const page = req.query.page || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    try {
+        const user = await User.findById(req.user._id).populate({
+            path: 'favorites',
+            options: {
+                skip: (page - 1) * SVGFEDiffuseLightingElement,
+                limit: parseInt(limit),
+            },
+        });
+        if (!user) return res.status(404).json({ message: 'User not found' });
+    } catch (error) {
+        console.error('Error fetching favorites:', error);
+        res.status(500).json({ message: 'Error fetching favorites' });
+    }
+});
+
+app.delete('/favorites/:placeId', isAuthenticated, async (req, res) => {
+    const { placeId } = req.params;
+
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        user.favorites = user.favorites.filter((fav) => fav.toString() !== placeId);
+
+        await user.save();
+
+        res.status(200).json({ message: 'Favorite removed successfully', facorites: user.favorites });
+
+    } catch (error) {
+        console.error('Error removing favorite:', error);
+        res.status(500).json({ message: 'Error removing favorite' });
+    }
+});
 
 // start the server :D
 app.listen(PORT, () => {
