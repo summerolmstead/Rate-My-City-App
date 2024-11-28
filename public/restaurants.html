@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
-
     /* Container for the stars */
+.favorited {
+    color: red;
+}
+
 .stars {
     display: flex;
     direction: row;
@@ -68,8 +71,27 @@
     </main>
 
     <script>
-        const placeList = document.getElementById('place-list');
 
+        async function highlightFavorites() {
+            try {
+                const response =await fetch('/favorites');
+                if (!response.ok) throw new Error('Failed to fetch favorites');
+
+                const favorites = await response.json();
+                favorites.forEach((favorite) => {
+                    const button = document.getElementById(`favorite-${favorite._id}`);
+                    if (button) {
+                        button.classList.add('favorited');
+                        button.innerHTML = '♥';
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error highlighting favorites:', error);
+            }
+        }
+        const placeList = document.getElementById('place-list');
+    
         // Function to fetch restaurants from the server
         async function loadRestaurants() {
             try {
@@ -95,9 +117,8 @@
                         item.classList.add('place-item');
                         item.innerHTML = `
                             <h3>${name}</h3>
-                            <button id="favorite-${placeId}"
-                                class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
-                                onclick="handleFavorteAndRedirect('{placeId}', '${place.name || 'Restaurant'}', '/personaluser')">
+                            <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
+                                onclick="handleFavorteAndRedirect('{placeId}', '${name}')">
                                 ${favorites.has(placeId) ? '♥' : '♡'}
                             </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
@@ -124,7 +145,6 @@
                                 <textarea name="comment" placeholder="Your comment here..." required></textarea>
                                 <button type="submit">Submit Comment</button>
                             </form>
-
                         `;
                         placeList.appendChild(item);
     
@@ -202,6 +222,8 @@
                         });
     
                     });  // Closing forEach
+
+                    highlightFavorites();
                 } else {
                     placeList.innerHTML = '<p>No restaurants found.</p>';
                 }
@@ -237,52 +259,27 @@
                 alert('Favorite Added');
             }
             saveFavorites();
-            updateFavoritesOnServer();
         }
 
-        async function updateFavoriteOnServer() {
-            try {
-                const response = await fetch('/update-favorites', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify([...favorites]),
-                });
-                if (!response.ok) {
-                    const errorData =await response.json();
-                    console.error('Error updating favorites:', errorData?.message || 'Unknown error');
-                    alert('Error syncing favorites with the server. Please try again.');
-                } else {
-                    console.log('Favorites successfully synced with the server.');
+        async function syncLocalFavorites() {
+            if (favorites.size > 0) {
+                try {
+                    const response = await fetch('/favorites', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify([...favorites]),
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error updaing favorites:', errorData?.message || 'Unknown error');
+                        alert('Error syncing favorites with the server. Please try again.');
+                    } else {
+                        console.log('Favorites successfully synced with the server.');
+                    }
+                } catch (error) {
+                    console.error('Network error updating favorites:', error);
+                    alert('Network error syncing favorites. Please try again later.');
                 }
-            } catch (error) {
-                console.error('Newtork error updating favorites:', error);
-                alert('Newtork error syncing favorites. Please try again later.');
-            }
-        }
-
-        async function handleFavoriteAndRedirect(placeId, placeName, redirectUrl) {
-            try {
-                const isFavorited = favorites.has(placeId);
-
-                const response = await fetch('/favorites', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ placeId }),
-                });
-
-                if (!response.ok) throw new Error('Failed to toggle favorite');
-                const data = await response.json();
-
-                if (isFavorited) {
-                    favorites.delete(placeId);
-                    alert(`Remove "${placeName}" to your favorites.`);
-                }
-                window.location.href = redirectUrl;
-            } catch (error) {
-                console.error('Error toggling favories:', error);
-                alert('Something went wrong. Please try agian.');
             }
         }
 
@@ -306,7 +303,7 @@
     
             return stars.join('');
         }
-
+    
         loadRestaurants();  // Initial call to load restaurants
     </script>
     
