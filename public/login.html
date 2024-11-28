@@ -86,11 +86,38 @@
     </form>
     <!-- logic with database -->
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
 
+    async function syncLocalFavorites() {
+        if (favorites.size > 0) {
+            try {
+                const response = await fetch('favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([...favorites]),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error updating favorites:', errorData?.message || 'Unknown error');
+                    alert('Error syncing favorites with the server. Please try again.');
+                } else {
+                    console.log('Favorites successdully synced with the server.');
+                }
+
+            } catch (error) {
+                console.error('Networking error updating favorites:', error);
+                alert('Network error syncing favorites. Please try again later');
+            }
+        }
+        
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -98,18 +125,33 @@
                 },
                 body: JSON.stringify({ username, password })
             });
-            // redirects only if gets the correct alert notified
+
+            // checking for the response status and content
+            const responseText = await response.text(); // get the response
+            console.log('Server Response:', response.status, responseText);
+
+            // Handle success or failure
             if (response.ok) {
                 alert('Login successful');
-                window.location.href = 'personaluser.html'; // redirect to personal user page
+                window.location.href = 'personaluser.html';
             } else {
-                alert('Invalid username or password. Please try again.'); // scenario doesnt work
+                alert('Invalid username or password. Please try again.');
             }
-        });
-        // go home function
-        function homePage() {
-            window.location.href = 'OriginalWebPage.html';
+        } catch (error) {
+            console.error('Error during login:', error);
+            alert('An error occurred. Please try again later.');
         }
+    });
+
+    // connected to the main menu button
+    function homePage() {
+        window.location.href = 'OriginalWebPage.html';
+    }
+
+    let faorites = new Set();
+    if (localStorage.getItem('favorites')) {
+        favorites = new Set(JSON.parse(localStorage.getItem('favorites')));
+    }
     </script>
 </body>
 </html>
