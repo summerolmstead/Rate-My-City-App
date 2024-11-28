@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const PlaceSchema = new mongoose.Schema({
-    placeId: String,
+    placeId: { type: String, unique: true },
     name: String,
     address: String,
     city: String,
@@ -22,8 +22,22 @@ const PlaceSchema = new mongoose.Schema({
         }
     ],
     category: String,  // Add the category field here to store the category (e.g., "restaurant", "hotel")
-    favoritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    favoriteCount: { type: Number, default: 0 }
 });
+
+PlaceSchema.methods.incrementFavoriteCount = function () {
+    this.favoriteCount += 1;
+    return this.save();
+};
+
+PlaceSchema.methods.decrementFavoriteCount = function () {
+    if (this,favoriteCount > 0) {
+        this.favoriteCount -= 1;
+    }
+    return this.save();
+};
+
+PlaceSchema.index({ placeID: 1 });
 
 module.exports = mongoose.model('Place', PlaceSchema);
 
