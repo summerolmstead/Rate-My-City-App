@@ -1206,7 +1206,7 @@ app.post('/favorites', isAuthenticated, async (req, res) => {
         }
         await user.save();
         await place.save();
-        
+
         res.status(200).json({ favorites: user.favorites });
 
     } catch (error) {
@@ -1222,7 +1222,7 @@ app.get('/favorites', isAuthenticated, async (req, res) => {
         const user = await User.findById(req.user._id).populate({
             path: 'favorites',
             options: {
-                skip: (page - 1) * SVGFEDiffuseLightingElement,
+                skip: (page - 1) * limit,
                 limit: parseInt(limit),
             },
         });
