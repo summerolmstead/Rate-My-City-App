@@ -19,7 +19,7 @@
             padding: 20px;
         }
         header {
-            background-color: #f9d718;
+            background-color: #d3e1c7;
             color: rgb(0, 0, 0);
             height: 100px; 
             width: 100%;
@@ -157,68 +157,55 @@
         <main>
             <h2>Your Favorites:</h2>
             <div id="favorites-container">
-            </div>
-            <script>
-
-                async function toggleFavorite(placeId) {
-                        try{
-                            const response = await fetch('/favorites', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ placeId }),
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                favorites = new Set(data.favorites.map((fav) => fav._id));
-                                saveFavorites();
-                                loadUserFavorites();
-                                alert('Favorite status updated.');
-                            } else {
-                                console.error('Error toggling favorite:', await response.text());
+                <!-- summer said - put logic later for calling stuff here -->
+                <script>
+                    async function syncLocalFavorites() {
+                        const localFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                        if (localFavorites.length > 0) {
+                            
+                                try {
+                                const response = await fetch('/favorites', {
+                                    method: 'POST',
+                                    headers: {'Content-Type': 'application/json' },
+                                    body: JSON.stringify(localFavorites),
+                                });
+                                if (response.ok) {
+                                    console.log('Favorites synced with server.');
+                                }
+                            } catch (error) {
+                                console.error('Error syncing favorites:', error);
                             }
-
-                        } catch (error) {
-                            console.error('Error toggling favorite:', error);
                         }
                     }
+                    async function loadUserFavorites() {
+                        try {
+                            const response = await fetch('/favorites');
+                            if (!response.ok) throw new Error('Failed to fetch favorites');
 
-                async function loadUserFavorites() {
-                    try {
-                        const response = await fetch('/favorites');
-                        if (!response.ok) throw new Error('Failed to fetch favorites');
-                        const favorites = await response.json();
-                        console.log('Fetched favorites:', favorites);
+                            const favorites = await response.json();
+                            const favoritesContainer = document.getElementById('favorites-container');
+                            favoritesContainer.innerHTML = '';
 
-                        const favoritesContainer = document.getElementById('favorites-container');
-                        favoritesContainer.innerHTML = '';
-
-                        if (Array.isArray(favorites) && favorites.length > 0) {
-                            favorites.forEach((favorite) => {
-                                console.log('Processing favorite:', favorite);
-
-                                if (!favorite.name || !favorite._id) {
-                                    console.error('Invalid favorite data:', favorite);
-                                    return;
-                                }
-                                const item = document.createElement('div');
-                                item.classList.add('favorite-item');
-                                item.innerHTML = `
+                            if (favorites.length > 0) {
+                                    favorites.forEach((favorite) => {
+                                        const item = document.createElement('div');
+                                        item.classList.add('favorite-item');
+                                        item.classList.add('favorite-item');
+                                        item.innerHTML = `
                                     <p>${favorite.name || 'Unnamed Place'}</P>
                                     <button onclick="removeFavorite('${favorite._id}')">Remove</button>
-                                `;
-                                favoritesContainer.appendChild(item);
-                            });
-                        } else {
-                            favoritesContainer.innerHTML = '<p>No favorites yet.</p>';
+                                    `;
+                                    favoritesContainer.appendChild(item);
+                                });
+                            } else {
+                                favoritesContainer.innerHTML = '<p>No favorites yet.</p>';
+                            }
+                        } catch (error) {
+                            console.error('Error loading favorites:', error);
+                            document.getElementById('favorites-container').innerHTML = '<p>Error loading favorites.<p>';
                         }
-                    } catch (error) {
-                        console.error('Error loading favorites:', error);
-                        document.getElementById('favorites-container').innerHTML = '<p>Error loading favorites.<p>';
                     }
-                }
-
-                document.addEventListener('DOMContentLoaded', async () => {
+                    document.addEventListener('DOMContentLoaded', async () => {
                     try {
                         const response = await fetch('/favorites');
                         if (!response.ok) throw new Error('Failed to fetch favorites');
@@ -264,11 +251,15 @@
                 document.addEventListener('DOMContentLoaded', () => {
                     loadUserFavorites();
                 });
-            </script>
+
+                 </script>
+            </div>
         </main>
     </div>
+
     <!-- needed to add this to communicate to backend to fetch this for frontend-->
     <script>
+
     function searchCity() 
     {
         var cityInput = document.getElementById('cityInput').value;
@@ -292,34 +283,33 @@
                 alert('Choose or type a city.');
             }
     }
-   document.addEventListener('DOMContentLoaded', async () => {
-    // Clear the firstName from localStorage if you just logged in or after signup
-    localStorage.removeItem('firstName');
-
-    // Check if firstName is already stored in localStorage
-    
+    document.addEventListener('DOMContentLoaded', async () => {
+    // Clear the firstName from localStorage if it belongs to another session
     const storedName = localStorage.getItem('firstName');
     if (storedName) {
-        // If the name is in localStorage, display it
+        // Show the stored name in the banner
         document.getElementById('user-name').innerText = storedName;
     } else {
-        // If no name in localStorage, fetch it from the backend
+        // Fetch the name from the backend if not found in localStorage
         try {
-            const response = await fetch('/personaluser', { cache: "no-store" });
+            const response = await fetch('/personaluser', { cache: 'no-store' });
             if (response.ok) {
                 const user = await response.json();
-                // Display the first name
-                document.getElementById('user-name').innerText = user.firstName;
-                // Store the first name in localStorage for future use
-                localStorage.setItem('firstName', user.firstName);
+                if (user && user.firstName) {
+                    document.getElementById('user-name').innerText = user.firstName;
+                    localStorage.setItem('firstName', user.firstName); // Cache the name
+                } else {
+                    console.error('No firstName in the response');
+                }
             } else {
-                console.error('Error: Unable to fetch user data.');
+                console.error('Failed to fetch user info:', response.status);
             }
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
     }
 });
+
     </script>
 </body>
 </html>
