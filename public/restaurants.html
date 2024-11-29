@@ -118,7 +118,7 @@
                         item.innerHTML = `
                             <h3>${name}</h3>
                             <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
-                                onclick="handleFavorteAndRedirect('{placeId}', '${name}')">
+                                onclick="toggleFavorite('${placeId}', '${name}')">
                                 ${favorites.has(placeId) ? '♥' : '♡'}
                             </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
