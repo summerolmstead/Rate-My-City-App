@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
+    .favorite-heart.favorited {
+            font-size: 24px;
+            width: 40x;
+            height: 40px;
+            color: red;
+
+        }
     /* Style for the genre buttons as tabs */
     #genre-buttons {
         display: flex;
@@ -55,7 +62,7 @@
     }
 
     .place-item textarea {
-        width: 100%;
+        width: 50%;
         padding: 10px;
         margin: 10px 0;
         border-radius: 5px;
@@ -99,6 +106,21 @@
     /* Full yellow star (use a yellow color for full star) */
     .star.full {
         background-color: #ffcc00; /* Full star yellow */
+    }
+    /* Style for the input field in the rating form */
+    .place-item form input[type="number"] {
+        width: 100px; /* Adjust width */
+        height: 40px; /* Adjust height */
+        font-size: 1.2rem; /* Adjust font size for better visibility */
+        padding: 10px; /* Add padding for a more comfortable look */
+        border-radius: 5px; /* Rounded corners */
+        border: 1px solid #ccc; /* Border color */
+        margin-bottom: 10px; /* Space below */
+    }
+
+    .place-item form input[type="number"]:focus {
+        border-color: #007bff; /* Highlight border on focus */
+        outline: none; /* Remove default outline */
     }
 
     /* Half yellow star effect (using a ::before pseudo-element to create the fill) */
@@ -183,6 +205,10 @@
                         item.classList.add('place-item');
                         item.innerHTML = `
                             <h4>${name}</h4>
+                            <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
+                                onclick="toggleFavorite('${placeId}', '${name}')">
+                                ${favorites.has(placeId) ? '♥' : '♡'}
+                            </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
                             <p><strong>City:</strong> ${city}</p>
                             <p><strong>Phone:</strong> ${phone}</p>
@@ -286,6 +312,57 @@
                 placeList.innerHTML = '<p>Error loading entertainment places.</p>';
             }
         }
+
+        let favorites = new Set();
+
+        if(localStorage.getItem('favorites')) {
+            favorites = new Set(JSON.parse(localStorage.getItem('favorites')));
+        }
+        function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify([...favorites]));
+        }
+
+        function toggleFavorite(placeId, name) {
+            const favoriteButton = document.getElementById(`favorite-${placeId}`);
+            const isFavorited = favorites.has(placeId);
+
+            if (isFavorited) {
+                favorites.delete(placeId);
+                favoriteButton.classList.remove('favorited');
+                favoriteButton.innerHTML = '♡';
+                alert('Favorite Removed');
+
+            } else {
+                favorites.add(placeId);
+                favoriteButton.classList.add('favorited');
+                favoriteButton.innerHTML = '♥';
+                alert('Favorite Added');
+            }
+            saveFavorites();
+        }
+
+        async function syncLocalFavorites() {
+            if (favorites.size > 0) {
+                try {
+                    const response = await fetch('/favorites', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify([...favorites]),
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error updaing favorites:', errorData?.message || 'Unknown error');
+                        alert('Error syncing favorites with the server. Please try again.');
+                    } else {
+                        console.log('Favorites successfully synced with the server.');
+                    }
+                } catch (error) {
+                    console.error('Network error updating favorites:', error);
+                    alert('Network error syncing favorites. Please try again later.');
+                }
+            }
+        }
+
     
         // Function to render stars with full, half, and empty stars using CSS classes
         function renderStars(rating) {
