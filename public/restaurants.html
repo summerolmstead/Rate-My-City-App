@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
-
+/*This formates the heart to favorite things*/
 .favorite-heart.favorited {
     font-size: 24px;
     width: 40x;
@@ -76,7 +76,7 @@
     </main>
 
     <script>
-
+// This allows us to highlight the favorites.
         async function highlightFavorites() {
             try {
                 const response =await fetch('/favorites');
@@ -118,6 +118,7 @@
                         const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
     
                         // Create HTML element for each place
+                        // Created a button that calls the toggle function below so that when you press it it shows what you favorited by filling the heart.
                         const item = document.createElement('div');
                         item.classList.add('place-item');
                         item.innerHTML = `
@@ -237,7 +238,7 @@
                 placeList.innerHTML = '<p>Error loading restaurants.</p>';
             }
         }
-
+// This is to set and toggle the favorites and added a local storage to each tab that stores what you have favorited.
         let favorites = new Set();
 
         if(localStorage.getItem('favorites')) {
