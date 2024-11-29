@@ -7,45 +7,137 @@
     <link rel="stylesheet" href="memphisstyles.css">
 </head>
 <style>
+    .favorite-heart.favorited {
+        font-size: 24px;
+        width: 40x;
+        height: 40px;
+        color: red;
+
+    }
+    /* Style for the genre buttons as tabs */
+    #genre-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .genre-button {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .genre-button:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .genre-button.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    /* Style for the place item (restaurant, etc.) */
+    .place-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px 0;
+        background-color: #f9f9f9;
+    }
+
+    .place-item h4 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .place-item p {
+        margin: 0.5rem 0;
+    }
+
+    .place-item textarea {
+        width: 50%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    /* Submit buttons for comment and rating */
+    .place-item form button {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 2px solid #ccc;
+        color: black;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .place-item form button:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
     /* Container for the stars */
-.stars {
-    display: flex;
-    direction: row;
-    font-size: 0;  /* Remove the space between the stars */
-}
+    .stars {
+        display: flex;
+        direction: row;
+        font-size: 0;
+    }
 
-/* The base star shape (empty star) */
-.star {
-    width: 20px;
-    height: 20px;
-    background-color: transparent;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    background-color: #e0e0e0; /* Empty star (light gray) */
-    margin: 0 2px; /* Add space between stars */
-    position: relative;
-}
+    /* The base star shape (empty star) */
+    .star {
+        width: 20px;
+        height: 20px;
+        background-color: transparent;
+        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        background-color: #e0e0e0; /* Empty star (light gray) */
+        margin: 0 2px;
+        position: relative;
+    }
 
-/* Full yellow star (use a yellow color for full star) */
-.star.full {
-    background-color: #ffcc00; /* Full star yellow */
-}
+    /* Full yellow star (use a yellow color for full star) */
+    .star.full {
+        background-color: #ffcc00; /* Full star yellow */
+    }
+    /* Style for the input field in the rating form */
+    .place-item form input[type="number"] {
+        width: 100px; /* Adjust width */
+        height: 40px; /* Adjust height */
+        font-size: 1.2rem; /* Adjust font size for better visibility */
+        padding: 10px; /* Add padding for a more comfortable look */
+        border-radius: 5px; /* Rounded corners */
+        border: 1px solid #ccc; /* Border color */
+        margin-bottom: 10px; /* Space below */
+    }
 
-/* Half yellow star effect (using a ::before pseudo-element to create the fill) */
-.star.half::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;  /* Half of the star will be yellow */
-    height: 100%;
-    background-color: #ffcc00;  /* Half of the star will be yellow */
-}
+    .place-item form input[type="number"]:focus {
+        border-color: #007bff; /* Highlight border on focus */
+        outline: none; /* Remove default outline */
+    }
 
-/* Empty star (default gray color) */
-.star.empty {
-    background-color: #e0e0e0; /* Empty star (light gray) */
-}
+    /* Half yellow star effect (using a ::before pseudo-element to create the fill) */
+    .star.half::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;  /* Half of the star will be yellow */
+        height: 100%;
+        background-color: #ffcc00;  /* Half of the star will be yellow */
+    }
 
+    /* Empty star (default gray color) */
+    .star.empty {
+        background-color: #e0e0e0; /* Empty star (light gray) */
+    }
 </style>
 <body>
     <header>
@@ -94,6 +186,10 @@
                         item.classList.add('place-item');
                         item.innerHTML = `
                             <h3>${name}</h3>
+                            <button id="favorite-${placeId}" class="favorite-heart ${favorites.has(placeId) ? 'favorited' : ''}"
+                                onclick="toggleFavorite('${placeId}', '${name}')">
+                                ${favorites.has(placeId) ? '♥' : '♡'}
+                            </button>
                             <p><strong>Street Address:</strong> ${streetAddress}</p>
                             <p><strong>City:</strong> ${city}</p>
                             <p><strong>Phone:</strong> ${phone}</p>
@@ -201,6 +297,56 @@
             } catch (error) {
                 console.error('Error fetching restaurant data:', error);
                 placeList.innerHTML = '<p>Error loading restaurants.</p>';
+            }
+        }
+
+        let favorites = new Set();
+
+        if(localStorage.getItem('favorites')) {
+            favorites = new Set(JSON.parse(localStorage.getItem('favorites')));
+        }
+        function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify([...favorites]));
+        }
+
+        function toggleFavorite(placeId, name) {
+            const favoriteButton = document.getElementById(`favorite-${placeId}`);
+            const isFavorited = favorites.has(placeId);
+
+            if (isFavorited) {
+                favorites.delete(placeId);
+                favoriteButton.classList.remove('favorited');
+                favoriteButton.innerHTML = '♡';
+                alert('Favorite Removed');
+
+            } else {
+                favorites.add(placeId);
+                favoriteButton.classList.add('favorited');
+                favoriteButton.innerHTML = '♥';
+                alert('Favorite Added');
+            }
+            saveFavorites();
+        }
+
+        async function syncLocalFavorites() {
+            if (favorites.size > 0) {
+                try {
+                    const response = await fetch('/favorites', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify([...favorites]),
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error updaing favorites:', errorData?.message || 'Unknown error');
+                        alert('Error syncing favorites with the server. Please try again.');
+                    } else {
+                        console.log('Favorites successfully synced with the server.');
+                    }
+                } catch (error) {
+                    console.error('Network error updating favorites:', error);
+                    alert('Network error syncing favorites. Please try again later.');
+                }
             }
         }
     
