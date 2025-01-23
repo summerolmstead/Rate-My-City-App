@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Your City</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lora:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Main Page Styles */
+        body {
+            background-color: #d3e1c7;
+            background-image: url('chattanooga_sketch.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            margin: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .banner {
+            width: 100%;
+            background-color: rgba(125, 159, 109, 0.8);
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .banner .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .banner h1 {
+            font-family: 'Lora', serif;
+            font-size: 28px;
+            color: #ffffff;
+            margin-left: 10px;
+        }
+
+        .banner img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .search-container input {
+            padding: 8px;
+            border: 1px solid #6f8a56;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 200px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-container button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #6f8a56;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .search-container button:hover {
+            background-color: #4e6e47;
+            color: #ffffff;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-buttons button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #6f8a56;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .auth-buttons button:hover {
+            background-color: #4e6e47;
+            color: #ffffff;
+        }
+
+        .content {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .content h2 {
+            font-family: 'Lora', serif;
+            font-size: 36px;
+            color: #7d9f6d;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .content img {
+            max-width: 80%;
+            height: auto;
+            margin: 20px 0;
+        }
+
+        /* Meet the Creators Section */
+        .creators {
+    background-image: url('utcpic7.jpg');
+    background-size: cover;
+    background-position: center;
+    color: black;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 150px; /* Added margin to add more space above */
+}
+
+
+        .creators .content {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .person {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .person img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        #prishaImage {
+    object-fit: cover;  /* Ensures Prisha's image keeps its aspect ratio */
+}
+
+        .person-info {
+            margin-left: 20px;
+            text-align: left;
+        }
+
+        .person-info h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .person-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner Section -->
+    <div class="banner">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Logo">
+            <h1>Rate Your City</h1>
+        </div>
+        <div class="search-container">
+            <input list="cities" id="cityInput" placeholder="Select or search for a city...">
+            <datalist id="cities">
+                <option value="Chattanooga">
+                <option value="Memphis"> 
+                <option value="Knoxville">
+                <option value="Nashville">
+
+                    
+            </datalist>
+            <button onclick="searchCity()">Search</button>
+        </div>
+        <div class="auth-buttons">
+            <button onclick="location.href='signup.html'">Sign Up</button>
+            <button onclick="location.href='login.html'">Log In</button>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+        <h2>Welcome to Rate Your City!</h2>
+        <p>This is a website that allows you to see the rates and comments of popular restaurants, hotels, entertainment spots</p>
+        </p>and healthcare facilities in the cities of Chattanooga, Memphis, Knoxville, and Nashville. </p>
+        <p>These cities are all we offer currently, and we hope to implement other nearby cities in the future! Happy exploring! </p>
+        <img src="chattanooga-outline-solid-black.png" alt="Chattanooga City Outline">
+    </div>
+
+    <!-- Meet the Creators Section -->
+    <div class="creators">
+        <div class="content">
+            <h1>Meet the Creators</h1>
+
+            <div class="person">
+                <img src="summerolmstead.jpg" alt="Summer Olmstead">
+                <div class="person-info">
+                    <h1>Summer Olmstead</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Data Science with a minor in Economics from Nashville, TN.</p>
+                    <p>Her passions include coding, hiking, and baking. <3</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="wyattgaines.jpg" alt="Wyatt Gaines">
+                <div class="person-info">
+                    <h1>Wyatt Gaines</h1>
+                    <p>I'm a current undergraduate senior at UTC majoring in Computer Science with a concentration in Data Science.</p>
+                    <p>I'm originally from Pulaski, TN. Some fun facts about me are I like to travel, read, code :), and binge-watch anything and everything on Netflix.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="kyle.jpg" alt="Kyle">
+                <div class="person-info">
+                    <h1>Kyle Greene</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Cyber Security with a minor in Psychology.</p>
+                    <p>From Jackson, TN. His passions include playing golf, sports, gaming, and traveling.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="nandnipatel.jpg" alt="Nandni Patel">
+                <div class="person-info">
+                    <h1>Nandni Patel</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Software Systems from Rossville, GA.</p>
+                    <p>Her passions include spending time with family/friends, traveling, and cooking.</p>
+                </div>
+            </div>
+
+            <div class="person">
+                <img src="Prisha.jpeg" alt="Prisha" id="prishaImage">
+                <div class="person-info">
+                    <h1>Prisha Purohit</h1>
+                    <p>An undergraduate senior at UTC majoring in Computer Science: Software Systems originally from Orlando, FL.</p>
+                    <p>In her free time, she loves hiking, kayaking, and hanging out with family and friends!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchCity() {
+            var cityInput = document.getElementById('cityInput').value;
+            if (cityInput.toLowerCase() === 'chattanooga') {
+                window.location.href = 'chattanooga.html';
+            } 
+            else if(cityInput.toLowerCase() === 'memphis')
+            {
+                window.location.href = "memphis.html"; //summer adding memphis to test if works w/ general logic
+            }
+            else if(cityInput.toLowerCase() === 'knoxville')
+            {
+                window.location.href = "knoxville.html"; //adding knoxville
+            }
+            else if(cityInput.toLowerCase() === 'nashville')
+            {
+                window.location.href = "nashville.html"; //adding knoxville
+            }
+            else 
+            {
+                alert('Choose or type a city.');
+            }
+        }
+    </script>
+</body>
+</html>

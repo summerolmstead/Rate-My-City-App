@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #d3e1c7;
+            color: rgb(0, 0, 0);
+            height: 100px; 
+            width: 100%;
+            display: flex;
+            align-items: center; 
+            padding: 0 20px; /* padding on the left and right */
+            position: fixed; /* make header fixed at the top */
+            top: 0; /* position it at the top */
+            left: 0; /* align to the left */
+            z-index: 1000; /* ensure it is on top of other content */
+            box-sizing: border-box;
+
+        }
+       
+        .container {
+            max-width: 800px;
+            margin: 120px auto 0; /* prevents overlap with fixed header */
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            max-width: 40%;
+            white-space: nowrap; /* Prevent the text from wrapping */
+            overflow: hidden; /* Hide overflow if too long */
+            text-overflow: ellipsis; /* Show ellipsis for overflow */
+            display: flex;
+            align-items: center;
+            max-width: 80%;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        .logo {
+            height: 75px; 
+            width: 75px; 
+            border-radius: 50%; /* make the logo circular */
+            object-fit: cover; 
+            margin-right: 20px;
+        }
+
+        
+        .menu {
+            margin-right: auto; /* space between the logo and the menu */
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu:hover {
+            text-decoration: underline;
+        }
+
+        /* for later to call favorite added container*/
+        #favorites-container {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+       
+        #user-name {
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .favorite-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .favorite-item:last-child {
+            border-bottom: none;
+        }
+        .search-container {
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .search-container input {
+            padding: 8px;
+            border: 1px solid #6f8a56;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 200px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-container button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #6f8a56;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .search-container button:hover {
+            background-color: #4e6e47;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="logo.jpeg" alt="Logo" class="logo">
+            <a href="OriginalWebPage.html" class="menu">Main Menu</a>
+            <div class="search-container">
+                <input list="cities" id="cityInput" placeholder="Select or search for a city...">
+                <datalist id="cities">
+                    <option value="Chattanooga">
+                    <option value="Memphis">
+                    <option value="Knoxville">
+                    <option value="Nashville">
+
+                    </option>
+                </datalist>
+                <button onclick="searchCity()">Search</button>
+            </div>
+            <h1 id="welcome-message">Welcome,<span id="user-name"></span> </h1>
+        </header>
+        <main>
+            <h2>Your Favorites:</h2>
+            <div id="favorites-container">
+                <!-- summer said - put logic later for calling stuff here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- needed to add this to communicate to backend to fetch this for frontend-->
+    <script>
+
+    function searchCity() 
+    {
+        var cityInput = document.getElementById('cityInput').value;
+        if (cityInput.toLowerCase() === 'chattanooga') {
+                window.location.href = 'chattanooga.html';
+            } 
+            else if(cityInput.toLowerCase() === 'memphis')
+            {
+                window.location.href = "memphis.html"; //summer adding memphis to test if works w/ general logic
+            }
+            else if(cityInput.toLowerCase() === 'knoxville')
+            {
+                window.location.href = "knoxville.html"; //adding knoxville
+            }
+            else if(cityInput.toLowerCase() === 'nashville')
+            {
+                window.location.href = "nashville.html"; //adding knoxville
+            }
+            else 
+            {
+                alert('Choose or type a city.');
+            }
+    }
+    document.addEventListener('DOMContentLoaded', async () => {
+    // Clear the firstName from localStorage if it belongs to another session
+    const storedName = localStorage.getItem('firstName');
+    if (storedName) {
+        // Show the stored name in the banner
+        document.getElementById('user-name').innerText = storedName;
+    } else {
+        // Fetch the name from the backend if not found in localStorage
+        try {
+            const response = await fetch('/personaluser', { cache: 'no-store' });
+            if (response.ok) {
+                const user = await response.json();
+                if (user && user.firstName) {
+                    document.getElementById('user-name').innerText = user.firstName;
+                    localStorage.setItem('firstName', user.firstName); // Cache the name
+                } else {
+                    console.error('No firstName in the response');
+                }
+            } else {
+                console.error('Failed to fetch user info:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    }
+});
+ 
+
+    </script>
+</body>
+</html>
+

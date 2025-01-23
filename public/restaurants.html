@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants in Chattanooga</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    /* Container for the stars */
+.stars {
+    display: flex;
+    direction: row;
+    font-size: 0;  /* Remove the space between the stars */
+}
+
+/* The base star shape (empty star) */
+.star {
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background-color: #e0e0e0; /* Empty star (light gray) */
+    margin: 0 2px; /* Add space between stars */
+    position: relative;
+}
+
+/* Full yellow star (use a yellow color for full star) */
+.star.full {
+    background-color: #ffcc00; /* Full star yellow */
+}
+
+/* Half yellow star effect (using a ::before pseudo-element to create the fill) */
+.star.half::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;  /* Half of the star will be yellow */
+    height: 100%;
+    background-color: #ffcc00;  /* Half of the star will be yellow */
+}
+
+/* Empty star (default gray color) */
+.star.empty {
+    background-color: #e0e0e0; /* Empty star (light gray) */
+}
+
+</style>
+<body>
+    <header>
+        <h1>Restaurants in Chattanooga</h1>
+        <nav>
+            <ul>
+                <li><a href="OriginalWebPage.html">Main Menu</a></li>
+                <li><a href="chattanooga.html">Home</a></li>
+                <li><a href="restaurants.html">Restaurants</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="entertainment.html">Entertainment</a></li>
+                <li><a href="healthcare.html">Healthcare</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="place-list">
+        <h2>Loading Restaurants...</h2>
+    </main>
+
+    <script>
+        const placeList = document.getElementById('place-list');
+    
+        // Function to fetch restaurants from the server
+        async function loadRestaurants() {
+            try {
+                const response = await fetch('/restaurants');
+                const places = await response.json();
+    
+                placeList.innerHTML = '';  // Clear the loading message
+    
+                if (places.length > 0) {
+                    places.forEach((place) => {
+                        const name = place.name || 'Name not available';
+                        const streetAddress = place.address || 'Street address not available';
+                        const city = place.city || 'City not available';
+                        const phone = place.phone || 'Phone number not available';
+                        const website = place.website || 'Website not available';
+                        const placeId = place.placeId;
+                        const ratings = place.ratings || [];
+                        const ratingCount = ratings.length;
+                        const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+                        // Create HTML element for each place
+                        const item = document.createElement('div');
+                        item.classList.add('place-item');
+                        item.innerHTML = `
+                            <h3>${name}</h3>
+                            <p><strong>Street Address:</strong> ${streetAddress}</p>
+                            <p><strong>City:</strong> ${city}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
+                            <div>
+                                <strong>Rating: </strong>
+                                <div id="rating-${placeId}" class="stars">${renderStars(averageRating)}</div>
+                                <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
+                            </div>
+    
+                            <h4>Comments:</h4>
+                            <ul id="comments-list-${placeId}">
+                                <!-- Comments will go here -->
+                            </ul>
+    
+                            <form id="rating-form-${placeId}">
+                                <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
+                                <button type="submit">Submit Rating</button>
+                            </form>
+    
+                            <form id="comment-form-${placeId}">
+                                <textarea name="comment" placeholder="Your comment here..." required></textarea>
+                                <button type="submit">Submit Comment</button>
+                            </form>
+                        `;
+                        placeList.appendChild(item);
+    
+                        // Render existing comments if any
+                        const commentsList = document.getElementById(`comments-list-${placeId}`);
+                        if (place.comments && place.comments.length > 0) {
+                            place.comments.forEach(comment => {
+                                const commentItem = document.createElement('li');
+                                commentItem.textContent = comment.text || 'No comment text available';
+                                commentsList.appendChild(commentItem);
+                            });
+                        }
+    
+                        // Event listener for the rating form
+                        document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            console.log("Submit button clicked!");
+    
+                            // Log the event target (the form itself) to inspect its contents
+                            console.log(event.target);  // This should log the entire form element
+    
+                            const ratingInput = event.target.rating;
+                            if (!ratingInput) {
+                                console.error("Rating input not found!");
+                                return;
+                            }
+    
+                            const rating = parseInt(ratingInput.value);
+    
+                            console.log("Rating submitted:", { rating});  // Log the values to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            const response = await fetch(`/rate/chattanooga/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ rating })
+                            });
+    
+                            if (response.ok) {
+                                alert('Rating submitted successfully!');
+                                loadRestaurants();  // Reload the places to show updated ratings and comments
+                            } else {
+                                alert('Error submitting rating');
+                            }
+                        });
+    
+                        // Event listener for the comment form
+                        document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const comment = event.target.comment.value;
+    
+                            const city = place.city.toLowerCase();  // Dynamically get the city
+                            console.log("City for comment:", city);  // Log to ensure city is correct
+    
+                            const response = await fetch(`/comment/${city}/${placeId}`, {  // Include the city in the route
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ text: comment })
+                            });
+    
+                            if (response.ok) {
+                                alert('Comment posted successfully!');
+                                loadRestaurants();  // Reload the places to show updated comments
+                            } else {
+                                alert('Error posting comment');
+                            }
+                        });
+    
+                    });  // Closing forEach
+                } else {
+                    placeList.innerHTML = '<p>No restaurants found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching restaurant data:', error);
+                placeList.innerHTML = '<p>Error loading restaurants.</p>';
+            }
+        }
+    
+        // Function to render stars with full, half, and empty stars using CSS classes
+        function renderStars(rating) {
+            const stars = [];
+    
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    
+            for (let i = 0; i < fullStars; i++) {
+                stars.push('<div class="star full"></div>');
+            }
+    
+            if (halfStar) stars.push('<div class="star half"></div>');
+            for (let i = 0; i < emptyStars; i++) {
+                stars.push('<div class="star empty"></div>');
+            }
+    
+            return stars.join('');
+        }
+    
+        loadRestaurants();  // Initial call to load restaurants
+    </script>
+    
+</body>
+</html>

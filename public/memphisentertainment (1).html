@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entertainment in Chattanooga</title>
+    <link rel="stylesheet" href="memphisstyles.css">
+</head>
+<style>
+    /* Style for the genre buttons as tabs */
+    #genre-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .genre-button {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .genre-button:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .genre-button.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    /* Style for the place item (restaurant, etc.) */
+    .place-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px 0;
+        background-color: #f9f9f9;
+    }
+
+    .place-item h4 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .place-item p {
+        margin: 0.5rem 0;
+    }
+
+    .place-item textarea {
+        width: 50%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    /* Submit buttons for comment and rating */
+    .place-item form button {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 2px solid #ccc;
+        color: black;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .place-item form button:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Container for the stars */
+    .stars {
+        display: flex;
+        direction: row;
+        font-size: 0;
+    }
+
+    /* The base star shape (empty star) */
+    .star {
+        width: 20px;
+        height: 20px;
+        background-color: transparent;
+        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        background-color: #e0e0e0; /* Empty star (light gray) */
+        margin: 0 2px;
+        position: relative;
+    }
+
+    /* Full yellow star (use a yellow color for full star) */
+    .star.full {
+        background-color: #ffcc00; /* Full star yellow */
+    }
+    /* Style for the input field in the rating form */
+    .place-item form input[type="number"] {
+        width: 100px; /* Adjust width */
+        height: 40px; /* Adjust height */
+        font-size: 1.2rem; /* Adjust font size for better visibility */
+        padding: 10px; /* Add padding for a more comfortable look */
+        border-radius: 5px; /* Rounded corners */
+        border: 1px solid #ccc; /* Border color */
+        margin-bottom: 10px; /* Space below */
+    }
+
+    .place-item form input[type="number"]:focus {
+        border-color: #007bff; /* Highlight border on focus */
+        outline: none; /* Remove default outline */
+    }
+
+    /* Half yellow star effect (using a ::before pseudo-element to create the fill) */
+    .star.half::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;  /* Half of the star will be yellow */
+        height: 100%;
+        background-color: #ffcc00;  /* Half of the star will be yellow */
+    }
+
+    /* Empty star (default gray color) */
+    .star.empty {
+        background-color: #e0e0e0; /* Empty star (light gray) */
+    }
+</style>
+<body>
+    <header>
+        <h1>Entertainment in Memphis</h1>
+        <nav>
+            <ul>
+                <li><a href="OriginalWebPage.html">Main Menu</a></li>
+                <li><a href="memphis.html">Home</a></li>
+                <li><a href="memphisrestaurants.html">Restaurants</a></li>
+                <li><a href="memphishotels.html">Hotels</a></li>
+                <li><a href="memphisentertainment.html">Entertainment</a></li>
+                <li><a href="memphishealthcare.html">Healthcare</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="entertainment-main">
+        <h2>Explore Entertainment in Memphis</h2>
+
+        <!-- Genre buttons (for each entertainment category) -->
+        <div id="genre-buttons">
+            <button class="genre-button" onclick="loadEntertainment('entertainment.bowling_alley')">Bowling Alleys</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.aquarium')">Aquariums</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.zoo')">Zoos</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.museum')">Museums</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.escape_game')">Escape Games</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.miniature_golf')">Miniature Golf</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.theme_park')">Theme Parks</button>
+            <button class="genre-button" onclick="loadEntertainment('entertainment.water_park')">Water Parks</button>
+        </div>
+
+        <div id="place-list">
+            <h3>Loading entertainment places...</h3>
+        </div>
+    </main>
+
+
+    <script>
+        const placeList = document.getElementById('place-list');
+    
+        // Function to load entertainment places based on category
+        async function loadEntertainment(category) {
+            placeList.innerHTML = '<h3>Loading...</h3>';  // Show loading message
+    
+            try {
+                const response = await fetch(`/memphisentertainment/${category}`);
+                const places = await response.json();
+    
+                placeList.innerHTML = '';  // Clear loading message
+    
+                if (places.length > 0) {
+                    places.forEach((place) => {
+                        const name = place.name || 'Name not available';
+                        const streetAddress = place.address || 'Street address not available';
+                        const city = place.city || 'City not available';
+                        const phone = place.phone || 'Phone number not available';
+                        const website = place.website || 'Website not available';
+                        const placeId = place.placeId;
+                        const ratings = place.ratings || [];
+                        const ratingCount = ratings.length;
+                        const averageRating = ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+                        // Create HTML element for each place
+                        const item = document.createElement('div');
+                        item.classList.add('place-item');
+                        item.innerHTML = `
+                            <h4>${name}</h4>
+                            <p><strong>Street Address:</strong> ${streetAddress}</p>
+                            <p><strong>City:</strong> ${city}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>
+                            <div>
+                                <strong>Rating: </strong>
+                                <div class="stars" id="rating-${placeId}">${renderStars(averageRating)}</div>
+                                <span id="rating-count-${placeId}">(${ratingCount} ratings)</span>
+                            </div>
+    
+                            <h4>Comments:</h4>
+                            <ul id="comments-list-${placeId}">
+                                <!-- Comments will go here -->
+                            </ul>
+    
+                            <form id="rating-form-${placeId}">
+                                <input type="number" name="rating" min="1" max="5" placeholder="Rate 1-5" required>
+                                <button type="submit">Submit Rating</button>
+                            </form>
+    
+                            <form id="comment-form-${placeId}">
+                                <textarea name="comment" placeholder="Your comment here..." required></textarea>
+                                <button type="submit">Submit Comment</button>
+                            </form>
+                        `;
+                        placeList.appendChild(item);
+    
+                        // Render existing comments if any
+                        const commentsList = document.getElementById(`comments-list-${placeId}`);
+                        if (place.comments && place.comments.length > 0) {
+                            place.comments.forEach(comment => {
+                                const commentItem = document.createElement('li');
+                                commentItem.textContent = comment.text || 'No comment text available';
+                                commentsList.appendChild(commentItem);
+                            });
+                        }
+    
+                        // Event listeners for rating and comment forms
+                        document.getElementById(`rating-form-${placeId}`).addEventListener('submit', async (event) => {
+                            console.log("Submit button clicked!");  // Check if the listener is firing
+                            event.preventDefault();
+    
+                            const rating = parseInt(event.target.rating.value);  // Get the rating value
+    
+                            console.log("Rating submitted", { rating });  // Log the rating to check
+    
+                            if (isNaN(rating) || rating < 1 || rating > 5) {
+                                alert('Please provide a valid rating between 1 and 5.');
+                                return;
+                            }
+    
+                            // Dynamically decide which route to hit based on the city (Chattanooga or Memphis)
+                            const city = place.city.toLowerCase(); // Assuming `place.city` holds the city name like "Chattanooga" or "Memphis"
+    
+                            const response = await fetch(`/rate/${city}/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ rating })  // Send only the rating
+                            });
+    
+                            if (response.ok) {
+                                const data = await response.json();  // Get the updated place data from the response
+                                alert('Rating submitted successfully!');
+    
+                                // Update the stars based on the new rating
+                                updateStars(data.place);
+                            } else {
+                                alert('Error submitting rating');
+                            }
+                        });
+    
+                        document.getElementById(`comment-form-${placeId}`).addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const comment = event.target.comment.value;
+    
+                            const city = place.city.toLowerCase();  // Dynamically decide which route to hit based on the city
+    
+                            const response = await fetch(`/comment/${city}/${placeId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ text: comment })
+                            });
+    
+                            if (response.ok) {
+                                alert('Comment posted successfully!');
+                                loadEntertainment(category); // Refresh the place list
+                            } else {
+                                alert('Error posting comment');
+                            }
+                        });
+                    });
+                } else {
+                    placeList.innerHTML = '<p>No entertainment places found for this category.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching entertainment places:', error);
+                placeList.innerHTML = '<p>Error loading entertainment places.</p>';
+            }
+        }
+    
+        // Function to render stars with full, half, and empty stars using CSS classes
+        function renderStars(rating) {
+            const stars = [];
+    
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    
+            for (let i = 0; i < fullStars; i++) {
+                stars.push('<div class="star full"></div>');
+            }
+    
+            if (halfStar) stars.push('<div class="star half"></div>');
+            for (let i = 0; i < emptyStars; i++) {
+                stars.push('<div class="star empty"></div>');
+            }
+    
+            return stars.join('');
+        }
+    
+        // Function to update the stars UI after rating submission
+        function updateStars(place) {
+            const ratingCount = place.ratings.length;
+            const averageRating = place.ratings.reduce((acc, r) => acc + r.rating, 0) / ratingCount || 0;
+    
+            const starsHtml = renderStars(averageRating);
+            document.getElementById(`rating-${place.placeId}`).innerHTML = starsHtml;
+            document.getElementById(`rating-count-${place.placeId}`).textContent = `(${ratingCount} ratings)`;
+        }
+    
+        // Initial load (optional, could be a default category)
+        loadEntertainment('entertainment.bowling_alley');
+    </script>
+    
+</body>
+</html>
